@@ -35,25 +35,11 @@ def run_skill(skill_name: str, user_text: str, role: RoleConfig, history: List[M
     """按名字调用对应技能模块，并返回统一的SkillResult"""
     ...
 
-def respond(user_text: str, state: SessionState, role: RoleConfig, llm_client, max_rounds: int = None) -> TurnResult:
-    max_rounds = max_rounds or settings.MAX_ROUNDS
-    system_prompt = build_system_prompt(role)
-    history = get_recent_messages(state, max_rounds=max_rounds)
-    messages = assemble_messages(system_prompt, history, user_text)
-
-    reply_text = llm_client.complete(messages, max_tokens=settings.MAX_TOKENS_RESPONSE)
-
-    # 更新会话（这里先用最简单的结构，等你实现 append_turn 再替换）
-    state.messages.append(Message(role="user", content=user_text))
-    state.messages.append(Message(role="assistant", content=reply_text))
-
-    return TurnResult(reply_text=reply_text, skill=None, data={}, audio_bytes=None)
-
-# def respond(user_text: str, state: SessionState, role: RoleConfig, llm_client, max_rounds: int = 8) -> TurnResult:
-#     """
-#     主流程：
-#     1) dispatcher.route() → 命中Skill？ → run_skill()
-#     2) 否则 → 走普通对话：build_system_prompt + assemble_messages + llm_client.complete()
-#     3) 统一构造 TurnResult（先不做TTS）
-#     """
-#     ...
+def respond(user_text: str, state: SessionState, role: RoleConfig, llm_client, max_rounds: int = 8) -> TurnResult:
+    """
+    主流程：
+    1) dispatcher.route() → 命中Skill？ → run_skill()
+    2) 否则 → 走普通对话：build_system_prompt + assemble_messages + llm_client.complete()
+    3) 统一构造 TurnResult（先不做TTS）
+    """
+    ...

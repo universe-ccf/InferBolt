@@ -11,6 +11,10 @@ class SessionState:
     last_skill: Optional[str] = None
 
 def append_turn(state: SessionState, user_msg: Message, assistant_msg: Message, max_rounds: int = 8) -> SessionState:
+    """追加一轮对话，并按轮数或token进行截断（MVP：按轮数截断）"""
+    ...
+
+def append_turn(state: SessionState, user_msg: Message, assistant_msg: Message, max_rounds: int = 8) -> SessionState:
     state.messages.append(user_msg)
     state.messages.append(assistant_msg)
     # 只保留最近 n 轮（user+assistant 为一轮，故 *2）
@@ -19,11 +23,10 @@ def append_turn(state: SessionState, user_msg: Message, assistant_msg: Message, 
         state.messages = state.messages[-keep:]
     return state
 
-def get_recent_messages(state: SessionState, max_rounds: int = 8) -> List[Message]:
-    # 返回最近 n 轮（user+assistant 为一轮，故 *2）
-    return state.messages[-2 * max_rounds :]
+def get_recent_messages(state: SessionState, n_rounds: int = 8) -> List[Message]:
+    """返回最近n轮user/assistant交替消息，用于拼Prompt"""
+    ...
 
 def reset_session(state: SessionState) -> SessionState:
-    state.messages.clear()
-    state.last_skill = None
-    return state
+    """一键重置会话（不改session_id），清空短期记忆"""
+    ...

@@ -190,7 +190,7 @@ import gradio as gr
 #             role_dd = gr.Dropdown(choices=list(BUILTIN_ROLES.keys()), value="Socratic Mentor", label="选择角色")
 #             reset_btn = gr.Button("重置会话", variant="secondary")
 
-#         chatbot = gr.Chatbot(label="对话区", height=350)
+#         chatbot = gr.Chatbot(label="对话区", height=380) # 原350
 
 #         with gr.Tab("文本对话"):
 #             with gr.Row():
@@ -241,90 +241,38 @@ import gradio as gr
 
 
 
+# # app/main.py
+# from __future__ import annotations
+# import gradio as gr
+# from core.state import SessionState, reset_session
+# from core.pipeline import respond
+# from core.types import RoleConfig
+# from clients.llm_client import LLMClient
+# from clients.asr_client import ASRClient
+# from clients.tts_client import TTSClient
+# from config import settings
 
-# === 引入你已写好的真实实现 ===
-from clients.llm_client import LLMClient
-from core.pipeline import respond
-from core.state import SessionState, reset_session
-from core.types import RoleConfig
+# def load_role_config(name: str) -> RoleConfig:
+#     """从 config/roles/*.json 读取并反序列化为 RoleConfig"""
+#     ...
 
-# === 临时内置的角色配置（后续可改为从 config/roles/*.json 加载）===
-BUILTIN_ROLES = {
-    "Socratic Mentor": RoleConfig(
-        name="Socratic Mentor",
-        style="古希腊哲学式、少给结论、以提问引导",
-        taboos=["医疗/法律诊断", "仇恨与歧视"],
-        persona=["坚持追问", "用类比引导思考"],
-        catchphrases=["让我们更深入地想一想"]
-    ),
-    "Coach Mentor": RoleConfig(
-        name="Coach Mentor",
-        style="温和、结构化、给出可执行建议",
-        taboos=["现实处方与诊断"],
-        persona=[""],
-        catchphrases=[""]
-    ),
-}
-def load_role_config(name: str) -> RoleConfig:
-    return BUILTIN_ROLES.get(name, list(BUILTIN_ROLES.values())[0])
+# def on_reset(session: SessionState) -> SessionState:
+#     """UI回调：一键重置会话"""
+#     ...
 
-# === 回调：文本输入 ===
-def on_user_submit_text(user_text: str, session: SessionState, role_name: str, llm: LLMClient):
-    try:
-        role = load_role_config(role_name)
-        turn = respond(user_text=user_text, state=session, role=role, llm_client=llm)
-        return [(user_text, turn.reply_text)], session
-    except Exception as e:
-        # 打印完整异常到终端，UI 给友好提示
-        import traceback; traceback.print_exc()
-        return [(user_text, "抱歉，内部出现错误，正在修复。")], session
+# def on_user_submit_text(user_text: str, session: SessionState, role_name: str, llm: LLMClient, tts: TTSClient):
+#     """文本输入流程：pipeline.respond → TTS → 返回文本与音频"""
+#     ...
 
-# === 回调：重置会话 ===
-def on_reset(session: SessionState):
-    reset_session(session)
-    return session
+# def on_user_submit_audio(audio_bytes: bytes, session: SessionState, role_name: str, llm: LLMClient, asr: ASRClient, tts: TTSClient):
+#     """语音输入流程：ASR → pipeline.respond → TTS → 返回文本与音频"""
+#     ...
 
-# === 组装 UI ===
-def build_ui():
-    with gr.Blocks(title="AI 角色扮演 · 文本闭环(MVP)") as demo:
-        gr.Markdown("## AI 角色扮演（文本闭环）\n已接入真实 LLM，先把主干跑通。")
+# def build_ui():
+#     """组装 Gradio 组件（聊天区、角色选择、录音、播放、技能标识），绑定回调"""
+#     ...
 
-        # 全局状态：会话 + LLM 客户端（持久化在 Gradio 的 State 里）
-        session_state = gr.State(SessionState(session_id=str(uuid.uuid4())))
-        llm_client = gr.State(LLMClient())   # 使用你在 .env/settings.py 配好的 API/模型
+# if __name__ == "__main__":
+#     build_ui()
 
-        with gr.Row():
-            role_dd = gr.Dropdown(choices=list(BUILTIN_ROLES.keys()),
-                                  value="Socratic Mentor",
-                                  label="选择角色")
-            reset_btn = gr.Button("重置会话", variant="secondary")
 
-        chatbot = gr.Chatbot(label="对话区", height=350)
-
-        with gr.Row():
-            txt_in = gr.Textbox(label="输入你的话", placeholder="试试：请用苏格拉底式追问我学习目标", lines=2)
-            send_btn = gr.Button("发送", variant="primary")
-
-        # 事件绑定
-        send_btn.click(
-            fn=on_user_submit_text,
-            inputs=[txt_in, session_state, role_dd, llm_client],
-            outputs=[chatbot, session_state]
-        ).then(  # 发送后清空输入框
-            lambda: "", None, txt_in
-        )
-
-        reset_btn.click(
-            fn=on_reset,
-            inputs=[session_state],
-            outputs=[session_state]
-        ).then(
-            lambda: None, None, chatbot
-        ).then(
-            lambda: "", None, txt_in
-        )
-
-    demo.launch()
-
-if __name__ == "__main__":
-    build_ui()

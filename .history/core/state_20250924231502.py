@@ -21,7 +21,7 @@ def append_turn(state: SessionState, user_msg: Message, assistant_msg: Message, 
 
 def get_recent_messages(state: SessionState, max_rounds: int = 8) -> List[Message]:
     # 返回最近 n 轮（user+assistant 为一轮，故 *2）
-    return state.messages[-2 * max_rounds :]
+    return state.messages[-2 * n_rounds :]
 
 def reset_session(state: SessionState) -> SessionState:
     state.messages.clear()

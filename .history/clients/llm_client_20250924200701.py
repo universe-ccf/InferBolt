@@ -6,6 +6,17 @@ from core.types import Message
 from config import settings
 
 class LLMClient:
+    # def __init__(self, model: str, temperature: float = 0.7, api_key: str | None = None, base_url: str | None = None):
+    #     ...
+
+    # def complete(self, messages: List[Message], max_tokens: int = 512) -> str:
+    #     """通用对话补全"""
+    #     ...
+
+    # def classify(self, text: str, schema: Dict[str, Any]) -> Dict[str, Any]:
+    #     """小型分类/意图识别（返回JSON），用作dispatcher兜底"""
+    #     ...
+
     def __init__(self, model: str | None = None, temperature: float = None,
                  api_key: str | None = None, base_url: str | None = None):
         self.model = model or settings.LLM_MODEL
@@ -23,7 +34,6 @@ class LLMClient:
             out.append({"role": m.role, "content": m.content})
         return out
 
-    # 通用对话补全
     def complete(self, messages: List[Message], max_tokens: int = 512) -> str:
         payload = {
             "model": self.model,
@@ -40,25 +50,12 @@ class LLMClient:
             resp = requests.post(self._chat_url, headers=headers, json=payload, timeout=settings.REQUEST_TIMEOUT)
             resp.raise_for_status()
             data = resp.json()
-            # —— 某些厂商兼容层有细微差异，这里更稳一点：
-            if isinstance(data, dict) and "choices" in data and data["choices"]:
-                choice = data["choices"][0]
-                # OpenAI 兼容通常是 message.content；部分实现也可能是 delta/content 或 text
-                if "message" in choice and "content" in choice["message"]:
-                    return choice["message"]["content"]
-                if "text" in choice:
-                    return choice["text"]
-            # 打印帮助排查
-            print("Unexpected LLM response:", resp.text[:500])
-            return "（抱歉，模型响应解析失败。）"
+            # 兼容 OpenAI 返回结构
+            return data["choices"][0]["message"]["content"]
         except requests.exceptions.RequestException as e:
-            print("LLM HTTP error:", getattr(e.response, "text", str(e)))
-            return "（抱歉，模型接口暂时不可用，请稍后再试。）"
-        except Exception as e:
-            print("LLM parse error:", type(e).__name__, e)
-            return "（抱歉，模型响应异常。）"
+            # 这里做最小兜底：返回一条友好提示，不抛出到 UI
+            return "（抱歉，模型接口暂时不可用，请稍后重试。）"
 
-    # 小型分类/意图识别（返回JSON），用作dispatcher兜底
     def classify(self, text: str, schema: Dict[str, Any]) -> Dict[str, Any]:
         """
         MVP：用提示词约束输出 JSON；后续可改“函数调用/JSON模式”。

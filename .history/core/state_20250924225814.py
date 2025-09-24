@@ -19,11 +19,10 @@ def append_turn(state: SessionState, user_msg: Message, assistant_msg: Message, 
         state.messages = state.messages[-keep:]
     return state
 
-def get_recent_messages(state: SessionState, max_rounds: int = 8) -> List[Message]:
+def get_recent_messages(state: SessionState, n_rounds: int = 8) -> List[Message]:
     # 返回最近 n 轮（user+assistant 为一轮，故 *2）
-    return state.messages[-2 * max_rounds :]
+    return state.messages[-2 * n_rounds :]
 
 def reset_session(state: SessionState) -> SessionState:
-    state.messages.clear()
-    state.last_skill = None
-    return state
+    """一键重置会话（不改session_id），清空短期记忆"""
+    ...
