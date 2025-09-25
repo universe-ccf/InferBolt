@@ -265,10 +265,10 @@ def load_role_config(name: str) -> RoleConfig:
     return ROLES_CACHE.get(name, list(ROLES_CACHE.values())[0])
 
 # === 回调：文本输入 ===
-def on_user_submit_text(user_text: str,
-                        session: SessionState,
-                        role_name: str,
-                        llm: LLMClient,
+def on_user_submit_text(user_text: str, 
+                        session: SessionState, 
+                        role_name: str, 
+                        llm: LLMClient, 
                         debug_on: bool):
     try:
         role = load_role_config(role_name)
@@ -277,24 +277,13 @@ def on_user_submit_text(user_text: str,
         label = SKILL_LABELS.get(turn.skill) if turn.skill else None
         skill_tag = f"🧠 已触发：`{label}`" if label else "—"
 
+        # 调试信息
         debug_md = "—"
         if debug_on:
             rd = turn.data.get("route_debug")
             if rd:
-                # 如果 classify 返回了分布，也显示
-                cls = rd.get("classify")
-                if isinstance(cls, dict) and "confidence_map" in cls:
-                    rd_pretty = {
-                        "rule_hit": rd.get("rule_hit"),
-                        "rule_name": rd.get("rule_name"),
-                        "best_skill": cls.get("skill"),
-                        "best_confidence": cls.get("confidence"),
-                        "confidence_map": cls.get("confidence_map"),
-                        "_raw_len": len(str(cls.get("_debug", {}).get("raw", "")))
-                    }
-                    debug_md = "### 路由调试\n```json\n" + json.dumps(rd_pretty, ensure_ascii=False, indent=2) + "\n```"
-                else:
-                    debug_md = "### 路由调试\n```json\n" + json.dumps(rd, ensure_ascii=False, indent=2) + "\n```"
+                debug_md = "### 路由调试\n```json\n" + json.dumps(rd, ensure_ascii=False, indent=2) + "\n```"
+
 
         return chat_pair, skill_tag, debug_md, session
     except Exception:

@@ -28,7 +28,7 @@ INTENT_CONF_THRESHOLD = 0.6
 
 # 评估/埋点
 ENABLE_LOGGING = True
-LOG_PATH = "logs/app2.jsonl"
+LOG_PATH = "logs/app.jsonl"
 
 DEBUG = True  # 开关：是否在UI与日志中输出调试信息
 

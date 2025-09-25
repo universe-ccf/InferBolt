@@ -90,16 +90,36 @@ def respond(user_text: str, state: SessionState, role: RoleConfig, llm_client, m
                 "route_debug": skill_call.args.get("debug"),
                 "reply_len": len(sres.reply_text)
             })
-        return TurnResult(reply_text=sres.reply_text, 
-                          skill=sres.name,
-                          data={"display_tag": sres.display_tag, 
-                                "route_debug": skill_call.args.get("debug")},
+        return TurnResult(reply_text=sres.reply_text, skill=sres.name,
+                          data={"display_tag": sres.display_tag, "route_debug": skill_call.args.get("debug")},
                           audio_bytes=None)
 
+
+
+
+    if skill_call is not None:
+        history = get_recent_messages(state, max_rounds=max_rounds)
+        sres = run_skill(skill_call.name, user_text, role, history, llm_client)
+        append_turn(state, Message(role="user", content=user_text), Message(role="assistant", content=sres.reply_text), max_rounds)
+        return TurnResult(reply_text=sres.reply_text, 
+                          skill=sres.name, 
+                          data={"display_tag": sres.display_tag}, 
+                          audio_bytes=None)
+
+    # 2) 普通对话
+    system_prompt = build_system_prompt(role)   # ← 会把 mission 带进去（见下一个小补丁）
+    history = get_recent_messages(state, max_rounds=max_rounds)
+    messages = assemble_messages(system_prompt, history, user_text)
+    reply_text = llm_client.complete(messages, max_tokens=settings.MAX_TOKENS_RESPONSE)
+    append_turn(state, Message(role="user", content=user_text), Message(role="assistant", content=reply_text), max_rounds)
+    return TurnResult(reply_text=reply_text, skill=None, data={}, audio_bytes=None)
+    
+    
+def respond(user_text: str, state: SessionState, role: RoleConfig, llm_client, max_rounds: int = None) -> TurnResult:
+    max_rounds = max_rounds or settings.MAX_ROUNDS
+
+    
+
+    
     # 理论不会到这
     return TurnResult(reply_text="（抱歉，路由异常。）", skill=None, data={}, audio_bytes=None)
-
-    
-
-    
-    

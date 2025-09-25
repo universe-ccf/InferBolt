@@ -8,7 +8,6 @@ from config import settings
 from skills import steelman as skill_steelman
 from skills import x_exam as skill_x_exam
 from skills import counterfactual as skill_cf
-from utils.logging import write_log
 
 
 # 根据角色配置生成system prompt（口吻、禁区、格式偏好）
@@ -53,53 +52,31 @@ def respond(user_text: str, state: SessionState, role: RoleConfig, llm_client, m
     max_rounds = max_rounds or settings.MAX_ROUNDS
     
     # 1) 技能优先
-    skill_call = route(user_text=user_text, role=role, llm_client=llm_client, context_hint=None)
-    
-    # 未命中：可能是 "__none__"
-    if skill_call and skill_call.name == "__none__":
-        route_debug = skill_call.args.get("debug", {})
-        # 普通对话
-        system_prompt = build_system_prompt(role)
-        history = get_recent_messages(state, max_rounds=max_rounds)
-        messages = assemble_messages(system_prompt, history, user_text)
-        reply_text = llm_client.complete(messages, max_tokens=settings.MAX_TOKENS_RESPONSE)
-        append_turn(state, Message(role="user", content=user_text), Message(role="assistant", content=reply_text), max_rounds)
-
-        if settings.DEBUG:
-            write_log(settings.LOG_PATH, {
-                "event": "chat_turn",
-                "path": "llm_default",
-                "user_text": user_text,
-                "route_debug": route_debug,
-                "reply_len": len(reply_text)
-            })
-        return TurnResult(reply_text=reply_text, skill=None, data={"route_debug": route_debug}, audio_bytes=None)
-
-    # 命中技能（规则或分类）
-    if skill_call and skill_call.name:
-        history = get_recent_messages(state, max_rounds=max_rounds)
+    skill_call = route(user_text=user_text, role=role, context_hint=None)
+    if skill_call is not None:
+        history = get_recent_messages(state, n_rounds=max_rounds)
         sres = run_skill(skill_call.name, user_text, role, history, llm_client)
         append_turn(state, Message(role="user", content=user_text), Message(role="assistant", content=sres.reply_text), max_rounds)
-
-        if settings.DEBUG:
-            write_log(settings.LOG_PATH, {
-                "event": "chat_turn",
-                "path": "skill",
-                "skill": sres.name,
-                "user_text": user_text,
-                "route_debug": skill_call.args.get("debug"),
-                "reply_len": len(sres.reply_text)
-            })
         return TurnResult(reply_text=sres.reply_text, 
-                          skill=sres.name,
-                          data={"display_tag": sres.display_tag, 
-                                "route_debug": skill_call.args.get("debug")},
+                          skill=sres.name, data={"display_tag": sres.display_tag}, 
                           audio_bytes=None)
 
-    # 理论不会到这
-    return TurnResult(reply_text="（抱歉，路由异常。）", skill=None, data={}, audio_bytes=None)
-
+    # 2) 普通对话
+    system_prompt = build_system_prompt(role)   # ← 会把 mission 带进去（见下一个小补丁）
+    history = get_recent_messages(state, max_rounds=max_rounds)
+    messages = assemble_messages(system_prompt, history, user_text)
+    reply_text = llm_client.complete(messages, max_tokens=settings.MAX_TOKENS_RESPONSE)
+    append_turn(state, Message(role="user", content=user_text), Message(role="assistant", content=reply_text), max_rounds)
+    return TurnResult(reply_text=reply_text, skill=None, data={}, audio_bytes=None)
+    
+    
     
 
-    
-    
+# def respond(user_text: str, state: SessionState, role: RoleConfig, llm_client, max_rounds: int = 8) -> TurnResult:
+#     """
+#     主流程：
+#     1) dispatcher.route() → 命中Skill？ → run_skill()
+#     2) 否则 → 走普通对话：build_system_prompt + assemble_messages + llm_client.complete()
+#     3) 统一构造 TurnResult（先不做TTS）
+#     """
+#     ...

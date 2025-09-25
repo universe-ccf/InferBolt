@@ -23,12 +23,12 @@ TTS_VOICE = "alloy"
 MAX_ROUNDS = 8
 MAX_TOKENS_RESPONSE = 512
 
-# 选择阈值（最高分需要≥该阈值才触发技能；否则走普通对话）
+# 触发策略
 INTENT_CONF_THRESHOLD = 0.6
 
 # 评估/埋点
 ENABLE_LOGGING = True
-LOG_PATH = "logs/app2.jsonl"
+LOG_PATH = "logs/app.jsonl"
 
 DEBUG = True  # 开关：是否在UI与日志中输出调试信息
 
