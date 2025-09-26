@@ -10,7 +10,6 @@ from core.roles import load_all_roles
 import json
 import numpy as np
 from core.pipeline import respond, respond_voice
-from config import settings
 
 
 SKILL_LABELS = {
@@ -145,21 +144,15 @@ def build_ui():
                 send_v = gr.Button("发送语音", variant="primary")
                 audio_out = gr.Audio(label="语音回复（TTS）", type="numpy")
         
+        
 
-        # 文本事件
+        # 事件绑定
         send_btn.click(
             fn=on_user_submit_text,
             inputs=[txt_in, session_state, role_dd, llm_client, debug_ck],
             outputs=[chatbot, skill_info, debug_panel, session_state]
         ).then(  # 发送后清空输入框
             lambda: "", None, txt_in
-        )
-
-        # 语音事件
-        send_v.click(
-            fn=on_user_submit_audio,
-            inputs=[mic, session_state, role_dd, llm_client, debug_ck],
-            outputs=[chatbot, skill_info, debug_panel, audio_out, session_state]
         )
 
         reset_btn.click(
@@ -172,8 +165,6 @@ def build_ui():
             lambda: "—", None, skill_info  # 重置技能指示
         ).then(
             lambda: "—", None, debug_panel
-        ).then(
-            lambda: None, None, audio_out
         ).then(
             lambda: "", None, txt_in
         )

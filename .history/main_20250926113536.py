@@ -10,7 +10,6 @@ from core.roles import load_all_roles
 import json
 import numpy as np
 from core.pipeline import respond, respond_voice
-from config import settings
 
 
 SKILL_LABELS = {
@@ -172,8 +171,6 @@ def build_ui():
             lambda: "—", None, skill_info  # 重置技能指示
         ).then(
             lambda: "—", None, debug_panel
-        ).then(
-            lambda: None, None, audio_out
         ).then(
             lambda: "", None, txt_in
         )

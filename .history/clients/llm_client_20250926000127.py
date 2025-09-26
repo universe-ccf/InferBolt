@@ -1,12 +1,9 @@
-# clients/llm_client.py
+# app/clients/llm_client.py
 from __future__ import annotations
 import os, json, requests, re
 from typing import List, Dict, Any
 from core.types import Message
 from config import settings
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
 class LLMClient:
     def __init__(self, model: str | None = None, temperature: float = None,
@@ -53,92 +50,27 @@ class LLMClient:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
-
         try:
-            # 第一次正常请求
-            resp = self.session.post(
-                self._chat_url, headers=headers, json=payload, timeout=settings.REQUEST_TIMEOUT
-            )
+            resp = requests.post(self._chat_url, headers=headers, json=payload, timeout=settings.REQUEST_TIMEOUT)
             resp.raise_for_status()
             data = resp.json()
+            # —— 某些厂商兼容层有细微差异，这里更稳一点：
             if isinstance(data, dict) and "choices" in data and data["choices"]:
                 choice = data["choices"][0]
+                # OpenAI 兼容通常是 message.content；部分实现也可能是 delta/content 或 text
                 if "message" in choice and "content" in choice["message"]:
                     return choice["message"]["content"]
                 if "text" in choice:
                     return choice["text"]
-
+            # 打印帮助排查
             print("Unexpected LLM response:", resp.text[:500])
             return "（抱歉，模型响应解析失败。）"
-
-        except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout) as e:
-            # 降级重试：收紧 max_tokens、温度、截断历史，以更快返回
-            print("Timeout, retrying with a lighter request:", type(e).__name__)
-            try:
-                lite_payload = dict(payload)
-                lite_payload["max_tokens"] = min(256, max_tokens)
-                lite_payload["temperature"] = 0.3
-                resp2 = self.session.post(
-                    self._chat_url, headers=headers, json=lite_payload,
-                    timeout=(settings.CONNECT_TIMEOUT, settings.READ_TIMEOUT + 10)  # 第二次读超时再放宽一点
-                )
-                resp2.raise_for_status()
-                data = resp2.json()
-                if isinstance(data, dict) and "choices" in data and data["choices"]:
-                    choice = data["choices"][0]
-                    if "message" in choice and "content" in choice["message"]:
-                        return choice["message"]["content"]
-                    if "text" in choice:
-                        return choice["text"]
-                print("Unexpected LLM response (retry):", resp2.text[:500])
-                return "（抱歉，模型响应解析失败。）"
-            except Exception as e2:
-                print("LLM timeout retry failed:", type(e2).__name__, str(e2)[:200])
-                return "（抱歉，模型接口读取超时，请稍后再试。）"
-
         except requests.exceptions.RequestException as e:
-            # 其他HTTP错误（含 429/5xx，经 Session 已自动重试）
-            body = getattr(e.response, "text", "")
-            print("LLM HTTP error:", body[:300] or str(e))
+            print("LLM HTTP error:", getattr(e.response, "text", str(e)))
             return "（抱歉，模型接口暂时不可用，请稍后再试。）"
-
         except Exception as e:
             print("LLM parse error:", type(e).__name__, e)
             return "（抱歉，模型响应异常。）"
-    
-    # def complete(self, messages: List[Message], max_tokens: int = 512) -> str:
-    #     payload = {
-    #         "model": self.model,
-    #         "messages": self._to_openai_messages(messages),
-    #         "temperature": self.temperature,
-    #         "max_tokens": max_tokens,
-    #         "stream": False
-    #     }
-    #     headers = {
-    #         "Authorization": f"Bearer {self.api_key}",
-    #         "Content-Type": "application/json"
-    #     }
-    #     try:
-    #         resp = requests.post(self._chat_url, headers=headers, json=payload, timeout=settings.REQUEST_TIMEOUT)
-    #         resp.raise_for_status()
-    #         data = resp.json()
-    #         # —— 某些厂商兼容层有细微差异，这里更稳一点：
-    #         if isinstance(data, dict) and "choices" in data and data["choices"]:
-    #             choice = data["choices"][0]
-    #             # OpenAI 兼容通常是 message.content；部分实现也可能是 delta/content 或 text
-    #             if "message" in choice and "content" in choice["message"]:
-    #                 return choice["message"]["content"]
-    #             if "text" in choice:
-    #                 return choice["text"]
-    #         # 打印帮助排查
-    #         print("Unexpected LLM response:", resp.text[:500])
-    #         return "（抱歉，模型响应解析失败。）"
-    #     except requests.exceptions.RequestException as e:
-    #         print("LLM HTTP error:", getattr(e.response, "text", str(e)))
-    #         return "（抱歉，模型接口暂时不可用，请稍后再试。）"
-    #     except Exception as e:
-    #         print("LLM parse error:", type(e).__name__, e)
-    #         return "（抱歉，模型响应异常。）"
 
 
     # def classify(self, text: str, schema: Dict[str, Any]) -> Dict[str, Any]:
@@ -242,10 +174,6 @@ class LLMClient:
         )
 
         raw = self.complete([system, user], max_tokens=220)
-        # raw = self.session.post(self._chat_url, 
-        #                         headers=headers, 
-        #                         json=payload,
-        #                         timeout=(settings.CONNECT_TIMEOUT, min(settings.READ_TIMEOUT, 15)))
 
         # 解析：从 raw 中抽取 JSON
         parsed, candidate_json = {}, "{}"

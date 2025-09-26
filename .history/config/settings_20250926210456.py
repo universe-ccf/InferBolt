@@ -1,4 +1,4 @@
-# config/settings.py
+# app/config/settings.py
 from __future__ import annotations
 import os
 from dotenv import load_dotenv
@@ -59,7 +59,7 @@ TTS_PROVIDER = "mock"        # 预留: "mock" | "vendor_xxx"
 AUDIO_SAMPLE_RATE = 16000    # 统一采样率（Hz）
 
 
-ASR_MODEL = "asr"            # ASR模型名（按官方示例）
+ASR_MODEL = "asr"            # 七牛云ASR模型名（按官方示例）
 ASR_INPUT_FORMAT = "wav"     # 我们走本地wav->base64上送。若用URL方式可切换为 "mp3" 等并走URL分支
 ASR_USE_URL_UPLOAD = False   # False=base64内联上传；True=传url（见下文asr_client的两种分支）
 

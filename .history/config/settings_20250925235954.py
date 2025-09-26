@@ -1,4 +1,4 @@
-# config/settings.py
+# app/config/settings.py
 from __future__ import annotations
 import os
 from dotenv import load_dotenv
@@ -27,7 +27,7 @@ INTENT_CONF_THRESHOLD = 0.6
 
 # 评估/埋点
 ENABLE_LOGGING = True
-LOG_PATH = "logs/app.jsonl"
+LOG_PATH = "logs/app2.jsonl"
 
 DEBUG = True  # 开关：是否在UI与日志中输出调试信息
 
@@ -51,19 +51,5 @@ REQUEST_TIMEOUT = (CONNECT_TIMEOUT, READ_TIMEOUT)
 HTTP_MAX_RETRIES = 2     # 读/超时的自动重试次数
 HTTP_BACKOFF_SEC = 0.5   # 指数退避初值
 
-# === Speech configs ===
-ENABLE_ASR = True           
-ENABLE_TTS = True        
-ASR_PROVIDER = "mock"        # 预留: "mock" | "vendor_xxx"
-TTS_PROVIDER = "mock"        # 预留: "mock" | "vendor_xxx"
-AUDIO_SAMPLE_RATE = 16000    # 统一采样率（Hz）
 
-
-ASR_MODEL = "asr"            # ASR模型名（按官方示例）
-ASR_INPUT_FORMAT = "wav"     # 我们走本地wav->base64上送。若用URL方式可切换为 "mp3" 等并走URL分支
-ASR_USE_URL_UPLOAD = False   # False=base64内联上传；True=传url（见下文asr_client的两种分支）
-
-TTS_VOICE = "zh_male_M392_conversation_wvae_bigtts"   # 官方示例音色
-TTS_ENCODING = "wav"         # 强烈建议用 "wav"，便于直接解码成numpy（避免mp3依赖）
-TTS_SPEED = 1.0
 

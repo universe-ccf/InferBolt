@@ -10,7 +10,6 @@ from core.roles import load_all_roles
 import json
 import numpy as np
 from core.pipeline import respond, respond_voice
-from config import settings
 
 
 SKILL_LABELS = {
@@ -69,44 +68,6 @@ def on_reset(session: SessionState):
     reset_session(session)
     return session
 
-# 语音处理
-def on_user_submit_audio(audio_tuple, session: SessionState, role_name: str, llm: LLMClient, debug_on: bool):
-    """
-    gr.Audio(type='numpy') 返回 (sr:int, audio:np.ndarray) 或 None
-    """
-    try:
-        if audio_tuple is None:
-            return [(None, "请先录音或上传音频。")], "—", "—", None, session
-
-        sr, audio_np = audio_tuple
-        # 归一化到 float32 [-1,1]
-        if audio_np.dtype != np.float32:
-            audio_np = audio_np.astype(np.float32)
-            maxv = max(1.0, np.max(np.abs(audio_np)))
-            audio_np = audio_np / maxv
-
-        role = load_role_config(role_name)
-        turn = respond_voice(audio_np=audio_np, sample_rate=sr, state=session, role=role, llm_client=llm)
-
-        chat_pair = [("🎤(语音)", turn.reply_text)]
-        label = SKILL_LABELS.get(turn.skill) if turn.skill else None
-        skill_tag = f"🧠 已触发：`{label}`" if label else "—"
-
-        debug_md = "—"
-        if debug_on:
-            rd = turn.data.get("route_debug")
-            if rd:
-                debug_md = "### 路由调试\n```json\n" + json.dumps(rd, ensure_ascii=False, indent=2) + "\n```"
-
-        # gr.Audio 输出 numpy 需返回 (sr, np.ndarray)
-        audio_out = (settings.AUDIO_SAMPLE_RATE, turn.audio_bytes) if isinstance(turn.audio_bytes, np.ndarray) else None
-        return chat_pair, skill_tag, debug_md, audio_out, session
-
-    except Exception:
-        import traceback; traceback.print_exc()
-        return [("🎤(语音)", "抱歉，语音处理异常。")], "—", "—", None, session
-
-
 # === 组装 UI ===
 def build_ui():
     with gr.Blocks(title="AI 角色扮演 · 思辨训练营(MVP)") as demo:
@@ -130,36 +91,19 @@ def build_ui():
 
         debug_panel = gr.Markdown(value="—", label="调试信息")
 
-        with gr.Tab("文本对话"):
-            with gr.Row():
-                txt_in = gr.Textbox(label="输入你的话", 
-                                    placeholder="例：强化论证 / 交叉质询 / 反事实挑战", 
-                                    lines=2)
-                send_btn = gr.Button("发送", variant="primary")
+        with gr.Row():
+            txt_in = gr.Textbox(label="输入你的话", 
+                                placeholder="例：请帮我强化论证 / 做交叉质询 / 做反事实挑战", 
+                                lines=2)
+            send_btn = gr.Button("发送", variant="primary")
 
-        with gr.Tab("语音对话"):
-            with gr.Row():
-                mic = gr.Audio(sources=["microphone", "upload"], 
-                               type="numpy", 
-                               label="录音或上传（单声道）")
-                send_v = gr.Button("发送语音", variant="primary")
-                audio_out = gr.Audio(label="语音回复（TTS）", type="numpy")
-        
-
-        # 文本事件
+        # 事件绑定
         send_btn.click(
             fn=on_user_submit_text,
             inputs=[txt_in, session_state, role_dd, llm_client, debug_ck],
             outputs=[chatbot, skill_info, debug_panel, session_state]
         ).then(  # 发送后清空输入框
             lambda: "", None, txt_in
-        )
-
-        # 语音事件
-        send_v.click(
-            fn=on_user_submit_audio,
-            inputs=[mic, session_state, role_dd, llm_client, debug_ck],
-            outputs=[chatbot, skill_info, debug_panel, audio_out, session_state]
         )
 
         reset_btn.click(
@@ -172,8 +116,6 @@ def build_ui():
             lambda: "—", None, skill_info  # 重置技能指示
         ).then(
             lambda: "—", None, debug_panel
-        ).then(
-            lambda: None, None, audio_out
         ).then(
             lambda: "", None, txt_in
         )

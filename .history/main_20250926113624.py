@@ -10,7 +10,6 @@ from core.roles import load_all_roles
 import json
 import numpy as np
 from core.pipeline import respond, respond_voice
-from config import settings
 
 
 SKILL_LABELS = {

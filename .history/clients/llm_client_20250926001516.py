@@ -1,4 +1,4 @@
-# clients/llm_client.py
+# app/clients/llm_client.py
 from __future__ import annotations
 import os, json, requests, re
 from typing import List, Dict, Any

@@ -1,4 +1,4 @@
-# clients/llm_client.py
+# app/clients/llm_client.py
 from __future__ import annotations
 import os, json, requests, re
 from typing import List, Dict, Any
@@ -242,10 +242,9 @@ class LLMClient:
         )
 
         raw = self.complete([system, user], max_tokens=220)
-        # raw = self.session.post(self._chat_url, 
-        #                         headers=headers, 
-        #                         json=payload,
-        #                         timeout=(settings.CONNECT_TIMEOUT, min(settings.READ_TIMEOUT, 15)))
+        raw = self.session.post(self._chat_url, headers=headers, json=payload,
+    timeout=(settings.CONNECT_TIMEOUT, min(settings.READ_TIMEOUT, 15))
+)
 
         # 解析：从 raw 中抽取 JSON
         parsed, candidate_json = {}, "{}"

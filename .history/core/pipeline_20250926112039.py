@@ -102,55 +102,6 @@ def respond(user_text: str, state: SessionState, role: RoleConfig, llm_client, m
     # 理论不会到这
     return TurnResult(reply_text="（抱歉，路由异常。）", skill=None, data={}, audio_bytes=None)
 
-
-def respond_voice(audio_np, sample_rate, state: SessionState, role: RoleConfig, llm_client) -> TurnResult:
-    """
-    非流式语音闭环：ASR -> respond(text) -> TTS
-    audio_np: np.ndarray mono float32
-    """
-    t0 = time.time()
-    asr_client = ASRClient()
-    tts_client = TTSClient()
-
-    # 1) ASR
-    t_asr0 = time.time()
-    asr_res = asr_client.transcribe(audio_np, sample_rate)
-    t_asr1 = time.time()
-
-    user_text = asr_res.text
-    # 2) LLM（复用已有 respond 文本流程）
-    t_llm0 = time.time()
-    turn_text = respond(user_text=user_text, state=state, role=role, llm_client=llm_client)
-    t_llm1 = time.time()
-
-    # 3) TTS
-    t_tts0 = time.time()
-    tts_res = tts_client.synthesize(turn_text.reply_text)
-    t_tts1 = time.time()
-
-    total = time.time() - t0
-
-    if settings.DEBUG:
-        write_log(settings.LOG_PATH, {
-            "event": "voice_turn",
-            "asr_ms": int((t_asr1 - t_asr0) * 1000),
-            "llm_ms": int((t_llm1 - t_llm0) * 1000),
-            "tts_ms": int((t_tts1 - t_tts0) * 1000),
-            "total_ms": int(total * 1000),
-            "asr_meta": asr_res.meta,
-            "tts_meta": tts_res.meta,
-            "user_text": user_text,
-            "skill": turn_text.skill,
-        })
-
-    # 把音频塞进 TurnResult
-    return TurnResult(
-        reply_text=turn_text.reply_text,
-        skill=turn_text.skill,
-        data={"route_debug": turn_text.data.get("route_debug")},
-        audio_bytes=tts_res.audio  # 这里返回 numpy，前端用 gr.Audio 播放
-    )
-
     
 
     
