@@ -1,0 +1,106 @@
+# clients/asr_client.py
+from __future__ import annotations
+from dataclasses import dataclass
+from typing import Optional, Tuple, Dict, Any
+import numpy as np
+import base64, io, wave
+import numpy as np
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+from config import settings
+from utils.cache import sha256_bytes, cache_get_text, cache_put_text
+
+@dataclass
+class ASRResult:
+    text: str
+    confidence: float
+    meta: Dict[str, Any]
+
+
+def _float32_to_wav_bytes(audio: np.ndarray, sample_rate: int) -> bytes:
+    # [-1,1] float32 -> int16 pcm wav
+    a = np.clip(audio, -1.0, 1.0)
+    pcm16 = (a * 32767.0).astype(np.int16)
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)  # 16-bit
+        wf.setframerate(sample_rate)
+        wf.writeframes(pcm16.tobytes())
+    return buf.getvalue()
+
+class ASRClient:
+    def __init__(self, provider: Optional[str] = None, base_url: Optional[str] = None, api_key: Optional[str] = None):
+        self.base_url = (base_url or getattr(settings, "BASE_URL", "https://openai.qiniu.com/v1")).rstrip("/")
+        self.api_key = api_key or getattr(settings, "API_KEY", None)
+        self._url = f"{self.base_url}/voice/asr"
+
+        # 带重试的Session
+        self.session = requests.Session()
+        retry = Retry(
+            total=settings.HTTP_MAX_RETRIES,
+            read=settings.HTTP_MAX_RETRIES,
+            connect=settings.HTTP_MAX_RETRIES,
+            backoff_factor=settings.HTTP_BACKOFF_SEC,
+            status_forcelist=(429, 502, 503, 504),
+            allowed_methods=frozenset(["POST"])
+        )
+        adapter = HTTPAdapter(max_retries=retry)
+        self.session.mount("https://", adapter)
+        self.session.mount("http://", adapter)
+
+    
+    def transcribe(self, audio: np.ndarray, sample_rate: int) -> ASRResult:
+        if not settings.ENABLE_ASR:
+            return ASRResult("（ASR未启用）", 0.0, {"provider": "qiniu", "enabled": False})
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+
+        # 两种上送方式：base64 或 url
+        if settings.ASR_USE_URL_UPLOAD:
+            # 按官方示例（需你提供可公网访问的URL）
+            data = {
+                "model": settings.ASR_MODEL,
+                "audio": {
+                    "format": settings.ASR_INPUT_FORMAT,   # 比如 "mp3"
+                    "url": "<PUT_YOUR_AUDIO_URL_HERE>"
+                }
+            }
+        else:
+            # 本地 numpy -> wav -> base64 内联
+            wav_bytes = _float32_to_wav_bytes(audio.astype(np.float32), sample_rate)
+            b64 = base64.b64encode(wav_bytes).decode("ascii")
+            data = {
+                "model": settings.ASR_MODEL,
+                "audio": {
+                    "format": "wav",
+                    "content": b64
+                }
+            }
+
+        try:
+            resp = self.session.post(self._url, headers=headers, json=data, timeout=settings.REQUEST_TIMEOUT)
+            resp.raise_for_status()
+            js = resp.json()
+
+            # 兼容不同字段名（你们实际返回可能是 {"text": "...", "confidence": 0.9} 或嵌套）
+            # 先平铺找：
+            text = js.get("text") or js.get("result") or js.get("transcript") or ""
+            conf = js.get("confidence") or js.get("score") or 0.0
+
+            # 如果在 data/audio 里：
+            if not text:
+                text = js.get("data", {}).get("text") or js.get("data", {}).get("transcript") or ""
+
+            return ASRResult(text=text or "（空识别结果）", confidence=float(conf or 0.0),
+                             meta={"provider": "qiniu", "status": "ok"})
+        except requests.exceptions.RequestException as e:
+            body = getattr(e.response, "text", "") if hasattr(e, "response") else str(e)
+            return ASRResult(text="（ASR请求失败）", confidence=0.0, meta={"provider": "qiniu", "error": body[:300]})
+        except Exception as e:
+            return ASRResult(text="（ASR解析异常）", confidence=0.0, meta={"provider": "qiniu", "error": str(e)[:300]})
+
