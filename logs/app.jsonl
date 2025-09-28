@@ -461,3 +461,93 @@
 {"ts_ms": 1759062639565, "event": "tts_trim_applied", "before_frames": 310103, "after_frames": 297143}
 {"ts_ms": 1759062639570, "event": "tts_save_done", "path": "cache/tts\\bf5035c69e036aa61df50e6002098272f4bb327efb711f2328d4c47a4ec5a5d0.wav", "bytes": 594330}
 {"ts_ms": 1759062639765, "event": "voice_sentence_loop_done", "asr_ms": 2937, "total_ms": 14678, "n_sent": 1}
+{"ts_ms": 1759070819318, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 19}
+{"ts_ms": 1759070819853, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '202509282247006600B01A95ADAF6C9402'}, 'text': ''}}"}
+{"ts_ms": 1759070820610, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759070821300, "event": "asr_ws_partial", "len": 3}
+{"ts_ms": 1759070821901, "event": "asr_ws_partial", "len": 6}
+{"ts_ms": 1759070822302, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1759070823199, "event": "asr_ws_partial", "len": 10}
+{"ts_ms": 1759070824763, "event": "asr_ws_done", "ms": 5443, "len": 10}
+{"ts_ms": 1759070831839, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759070842325, "event": "tts_response", "bytes": 1044190}
+{"ts_ms": 1759070842498, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 522073, "rms_db": -18.87647439199616}
+{"ts_ms": 1759070842506, "event": "tts_trim_applied", "before_frames": 522073, "after_frames": 509113}
+{"ts_ms": 1759070842517, "event": "tts_save_done", "path": "cache/tts\\a1ce74ca8cca500f3dda4005feb3c1f14e944156c017a713ebb2edb9ce55bc15.wav", "bytes": 1018270}
+{"ts_ms": 1759070842603, "event": "voice_sentence_loop_done", "asr_ms": 5536, "total_ms": 23309, "n_sent": 1}
+{"ts_ms": 1759070895044, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 9}
+{"ts_ms": 1759070895678, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250928224816B0A01D650F7791693E4C'}, 'text': ''}}"}
+{"ts_ms": 1759070896501, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759070896902, "event": "asr_ws_partial", "len": 4}
+{"ts_ms": 1759070897168, "event": "asr_ws_partial", "len": 6}
+{"ts_ms": 1759070898927, "event": "asr_ws_done", "ms": 3879, "len": 6}
+{"ts_ms": 1759070902466, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759070912590, "event": "tts_response", "bytes": 706600}
+{"ts_ms": 1759070912697, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 353278, "rms_db": -17.77146664770314}
+{"ts_ms": 1759070912705, "event": "tts_trim_applied", "before_frames": 353278, "after_frames": 340318}
+{"ts_ms": 1759070912770, "event": "tts_save_done", "path": "cache/tts\\8cdae1a5251e34331401d0e7e88efc67620e8fb92cfa0899477bb50cafa4af24.wav", "bytes": 680680}
+{"ts_ms": 1759070912844, "event": "voice_sentence_loop_done", "asr_ms": 3946, "total_ms": 17818, "n_sent": 1}
+{"ts_ms": 1759070954590, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 11}
+{"ts_ms": 1759070955213, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '202509282249152E1013D096CA2857C0C1'}, 'text': ''}}"}
+{"ts_ms": 1759070955653, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759070955916, "event": "asr_ws_partial", "len": 4}
+{"ts_ms": 1759070956176, "event": "asr_ws_partial", "len": 6}
+{"ts_ms": 1759070956428, "event": "asr_ws_partial", "len": 9}
+{"ts_ms": 1759070956676, "event": "asr_ws_partial", "len": 11}
+{"ts_ms": 1759070956918, "event": "asr_ws_partial", "len": 14}
+{"ts_ms": 1759070957521, "event": "asr_ws_partial", "len": 17}
+{"ts_ms": 1759070957801, "event": "asr_ws_partial", "len": 18}
+{"ts_ms": 1759070958906, "event": "asr_ws_done", "ms": 4314, "len": 18}
+{"ts_ms": 1759070962732, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759070971415, "event": "tts_response", "bytes": 609222}
+{"ts_ms": 1759070971507, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 304589, "rms_db": -17.17422676949313}
+{"ts_ms": 1759070971516, "event": "tts_trim_applied", "before_frames": 304589, "after_frames": 291629}
+{"ts_ms": 1759070971519, "event": "tts_save_done", "path": "cache/tts\\f6d7a407b77aea6efa99ac468b9fd22f0a04d0bab08ca0812d31bd60ab50e754.wav", "bytes": 583302}
+{"ts_ms": 1759070971582, "event": "voice_sentence_loop_done", "asr_ms": 4380, "total_ms": 17010, "n_sent": 1}
+{"ts_ms": 1759071923442, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 14}
+{"ts_ms": 1759071924051, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250928230524758E269927AE6D609D9A'}, 'text': ''}}"}
+{"ts_ms": 1759071925226, "event": "asr_ws_partial", "len": 3}
+{"ts_ms": 1759071925702, "event": "asr_ws_partial", "len": 6}
+{"ts_ms": 1759071925949, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1759071926490, "event": "asr_ws_partial", "len": 9}
+{"ts_ms": 1759071926799, "event": "asr_ws_partial", "len": 13}
+{"ts_ms": 1759071927026, "event": "asr_ws_partial", "len": 16}
+{"ts_ms": 1759071928311, "event": "asr_ws_done", "ms": 4866, "len": 16}
+{"ts_ms": 1759071933058, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.98, "encoding": "wav"}
+{"ts_ms": 1759071942800, "event": "tts_response", "bytes": 880624}
+{"ts_ms": 1759071942946, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 440290, "rms_db": -17.147737795658067}
+{"ts_ms": 1759071942956, "event": "tts_trim_applied", "before_frames": 440290, "after_frames": 428050}
+{"ts_ms": 1759071942966, "event": "tts_save_done", "path": "cache/tts\\d421b48287850a18cc5b35d816cfa50e9ca51b2e2f393a6399de5f1c76ef450c.wav", "bytes": 856144}
+{"ts_ms": 1759071943053, "event": "voice_sentence_loop_done", "asr_ms": 4965, "total_ms": 19634, "n_sent": 1}
+{"ts_ms": 1759074887196, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 31}
+{"ts_ms": 1759074887769, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250928235448106F8D8821C6635C04C3'}, 'text': ''}}"}
+{"ts_ms": 1759074888694, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759074889108, "event": "asr_ws_partial", "len": 4}
+{"ts_ms": 1759074889906, "event": "asr_ws_partial", "len": 5}
+{"ts_ms": 1759074890685, "event": "asr_ws_partial", "len": 6}
+{"ts_ms": 1759074891142, "event": "asr_ws_partial", "len": 8}
+{"ts_ms": 1759074891608, "event": "asr_ws_partial", "len": 10}
+{"ts_ms": 1759074891860, "event": "asr_ws_partial", "len": 11}
+{"ts_ms": 1759074892762, "event": "asr_ws_partial", "len": 12}
+{"ts_ms": 1759074893750, "event": "asr_ws_partial", "len": 13}
+{"ts_ms": 1759074894038, "event": "asr_ws_partial", "len": 16}
+{"ts_ms": 1759074894309, "event": "asr_ws_partial", "len": 18}
+{"ts_ms": 1759074894686, "event": "asr_ws_partial", "len": 21}
+{"ts_ms": 1759074895798, "event": "asr_ws_done", "ms": 8600, "len": 21}
+{"ts_ms": 1759074899133, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759074902844, "event": "tts_response", "bytes": 715238}
+{"ts_ms": 1759074902928, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 357597, "rms_db": -16.51908919270928}
+{"ts_ms": 1759074902936, "event": "tts_trim_applied", "before_frames": 357597, "after_frames": 345357}
+{"ts_ms": 1759074902946, "event": "tts_save_done", "path": "cache/tts\\a25fa4a67408acd072e01eed69b6a0ca07752d33a3c193792d278b6c9c226efc.wav", "bytes": 690758}
+{"ts_ms": 1759074903011, "event": "voice_sentence_loop_done", "asr_ms": 8691, "total_ms": 15846, "n_sent": 1}
+{"ts_ms": 1759074972742, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 6}
+{"ts_ms": 1759074973256, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '202509282356131921857E99C9A95FE590'}, 'text': ''}}"}
+{"ts_ms": 1759074973883, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759074974159, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1759074975493, "event": "asr_ws_done", "ms": 2749, "len": 7}
+{"ts_ms": 1759074977942, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759074981367, "event": "tts_response", "bytes": 546438}
+{"ts_ms": 1759074981462, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 273197, "rms_db": -16.824458878240144}
+{"ts_ms": 1759074981473, "event": "tts_trim_applied", "before_frames": 273197, "after_frames": 260957}
+{"ts_ms": 1759074981478, "event": "tts_save_done", "path": "cache/tts\\27d350fd2e8c7baf5496647392bb79a618bbc7f0112cdb6cff822e03bbe9fc93.wav", "bytes": 521958}
+{"ts_ms": 1759074981555, "event": "voice_sentence_loop_done", "asr_ms": 2826, "total_ms": 8832, "n_sent": 1}

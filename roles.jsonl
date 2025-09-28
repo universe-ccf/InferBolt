@@ -7,10 +7,24 @@
 {"voice_name":"干练课堂思思","voice_type":"qiniu_zh_female_glktss","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_female_glktss.mp3","category":"传统音色","updatetime":1747812605458},
 {"voice_name":"温和学科小哥","voice_type":"qiniu_zh_male_whxkxg","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_male_whxkxg.mp3","category":"传统音色","updatetime":1747812605458},
 {"voice_name":"温暖沉稳学长","voice_type":"qiniu_zh_male_wncwxz","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_male_wncwxz.mp3","category":"传统音色","updatetime":1747812605458},
-{"voice_name":"开朗教学督导","voice_type":"qiniu_zh_female_kljxdd","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_female_kljxdd.mp3","category":"传统音色","updatetime":1747812605458},
+
+{"voice_name":"开朗教学督导",
+ "voice_type":"qiniu_zh_female_kljxdd",
+ "url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_female_kljxdd.mp3",
+ "category":"传统音色",
+ "updatetime":1747812605458},
+
 {"voice_name":"渊博学科男教师","voice_type":"qiniu_zh_male_ybxknjs","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_male_ybxknjs.mp3","category":"传统音色","updatetime":1747812605458},
 {"voice_name":"火力少年凯凯","voice_type":"qiniu_zh_male_hlsnkk","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_male_hlsnkk.mp3","category":"传统音色","updatetime":1747812605458},
-{"voice_name":"通用阳光讲师","voice_type":"qiniu_zh_male_tyygjs","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_male_tyygjs.mp3","category":"传统音色","updatetime":1747812605458},
+
+
+{"voice_name":"通用阳光讲师",
+"voice_type":"qiniu_zh_male_tyygjs",
+"url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_male_tyygjs.mp3",
+"category":"传统音色",
+"updatetime":1747812605458},
+
+
 {"voice_name":"知性教学女教师","voice_type":"qiniu_zh_female_zxjxnjs","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_female_zxjxnjs.mp3","category":"传统音色","updatetime":1747812605458},
 {"voice_name":"澳洲英语女","voice_type":"qiniu_en_female_azyy","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_en_female_azyy.mp3","category":"双语音色","updatetime":1747812605458},
 {"voice_name":"日西双语女1","voice_type":"qiniu_multi_female_rxsyn1","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_multi_female_rxsyn1.mp3","category":"双语音色","updatetime":1747812605458},
@@ -40,4 +54,10 @@
 {"voice_name":"趣味知识传播","voice_type":"qiniu_zh_female_qwzscb","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_female_qwzscb.mp3","category":"特殊音色","updatetime":1747812605460},
 {"voice_name":"名著角色猴哥","voice_type":"qiniu_zh_male_mzjsxg","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_male_mzjsxg.mp3","category":"特殊音色","updatetime":1747812605460},
 {"voice_name":"英语启蒙佩奇","voice_type":"qiniu_zh_female_yyqmpq","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_female_yyqmpq.mp3","category":"特殊音色","updatetime":1747812605460},
-{"voice_name":"天才少年示范","voice_type":"qiniu_zh_male_tcsnsf","url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_male_tcsnsf.mp3","category":"特殊音色","updatetime":1747812605460}
+
+
+{"voice_name":"天才少年示范",
+"voice_type":"qiniu_zh_male_tcsnsf",
+"url":"https://aitoken-public.qnaigc.com/ai-voice/qiniu_zh_male_tcsnsf.mp3",
+"category":"特殊音色",
+"updatetime":1747812605460}

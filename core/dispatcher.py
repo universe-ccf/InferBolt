@@ -5,8 +5,8 @@ from .types import SkillCall, RoleConfig
 from config import settings
 
 
-# 思辨训练营：三技能的关键词触发
 _RULES = [
+    # 思辨训练营：三技能的关键词触发
     # 强化论证（Steelman）
     ({"强化", "打磨", "完善", "更强", "steelman", "最佳表述", "最强论证", }, "steelman"),
     #  "扎实", "更扎实", "说服力", "立场", "论证"  
@@ -16,7 +16,24 @@ _RULES = [
 
     # 反事实挑战（Counterfactual）
     ({"反事实", "如果不", "若相反", "假如相反", "假设变化", "换个前提"}, "counterfactual"),
+
+    # Luma
+    # 故事生成
+    ({"故事", "讲个故事", "写个故事", "隐喻"}, "luma_story"),
+    # 正向重构
+    ({"开导", "正向重构", "换角度", "重构", "情绪"}, "luma_reframe"),
+    # 陪伴角色扮演
+    ({"扮演", "陪伴", "像我的朋友", "像我女朋友", "像我男朋友", "以XX身份说话"}, "luma_roleplay"),
+
+    # Aris
+    # 逆向挑战
+    ({"逆向挑战", "你来解", "现场解析", "解题", "我出题"}, "aris_reverse"),
+    # 互动练习
+    ({"互动练习", "给我练习", "小测", "做题训练"}, "aris_practice"),
+    # 双向映射
+    ({"双向映射", "数学与编程", "代码与数学", "类比讲解"}, "aris_bimap"),
 ]
+
 
 
 def route(user_text: str, role: RoleConfig, llm_client=None,

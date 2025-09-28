@@ -1,0 +1,14 @@
+{
+    "name": "Know-it-all",
+    "style": "",
+    "persona": [""],
+    "catchphrases": [""],
+    "taboos": [""],
+    "format_prefs": {"bullets": true, "max_words": 200},
+    "mission": "",
+    "tts": {
+    "voice_type": "qiniu_zh_female_tmjxxy",
+    "speed_ratio": 1
+  }
+  }
+  

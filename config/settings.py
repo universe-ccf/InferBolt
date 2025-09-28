@@ -32,7 +32,13 @@ LOG_PATH = "logs/app.jsonl"
 DEBUG = True  # 开关：是否在UI与日志中输出调试信息
 
 # 思辨训练营 - 技能候选集合（可随时扩展）
-SKILL_CANDIDATES = ["steelman", "x_exam", "counterfactual", "none"]
+SKILL_CANDIDATES = ["steelman", "x_exam", "counterfactual",  "none"]
+
+# Luma
+SKILL_CANDIDATES_Luma = ["luma_story", "luma_reframe", "luma_roleplay"]
+
+# Aris
+SKILL_CANDIDATES_Aris = ["aris_reverse", "aris_practice", "aris_bimap"]
 
 # 每个技能的简短说明（注入到提示词里，帮助模型理解边界）
 SKILL_DESCRIPTIONS = {
@@ -41,6 +47,16 @@ SKILL_DESCRIPTIONS = {
     "counterfactual": "当用户想要在关键假设变化下推演结果（如果不这样/反过来/换前提）。",
     "none": "以上皆不符合，或只是闲聊/无法判断。"
 }
+
+SKILL_DESCRIPTIONS_Luma = {
+    "luma_story": "把用户的主题/情绪转化为一个有启发的短故事。",
+    "luma_reframe": "对负面叙述做温和的认知重构，给出可操作的新视角。",
+    "luma_roleplay": "按用户要求扮演亲友/伴侣等，进行陪伴式对话。"}
+
+SKILL_DESCRIPTIONS_Aris = {
+    "aris_reverse": "用户出题，现场解析，展示清晰可验证的解题路径。",
+    "aris_practice": "出一小题并给三条递进提示，等待用户作答再给详解。",
+    "aris_bimap": "用数学与编程两种视角解释同一概念，互证并给示例。"}
 
 # 超时（秒）
 CONNECT_TIMEOUT = 5      # 连接建立

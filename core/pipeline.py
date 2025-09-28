@@ -8,6 +8,8 @@ from config import settings
 from skills import steelman as skill_steelman
 from skills import x_exam as skill_x_exam
 from skills import counterfactual as skill_cf
+from skills import luma_story, luma_reframe, luma_roleplay
+from skills import aris_reverse, aris_practice, aris_bimap
 from utils.logging import write_log
 import time
 from clients.asr_client import ASRClient
@@ -52,6 +54,23 @@ def run_skill(skill_name: str, user_text: str, role: RoleConfig, history: list[M
         return skill_x_exam.run(user_text, role, history, llm_client)
     if skill_name == "counterfactual":
         return skill_cf.run(user_text, role, history, llm_client)
+    
+    # Luma
+    if skill_name == "luma_story":
+        return luma_story.run(user_text, role, history, llm_client)
+    if skill_name == "luma_reframe":
+        return luma_reframe.run(user_text, role, history, llm_client)
+    if skill_name == "luma_roleplay":
+        return luma_roleplay.run(user_text, role, history, llm_client)
+
+    # Aris
+    if skill_name == "aris_reverse":
+        return aris_reverse.run(user_text, role, history, llm_client)
+    if skill_name == "aris_practice":
+        return aris_practice.run(user_text, role, history, llm_client)
+    if skill_name == "aris_bimap":
+        return aris_bimap.run(user_text, role, history, llm_client)
+
     # 未知技能：回退普通对话
     return SkillResult(name="none", display_tag="", reply_text=user_text, data={})
 

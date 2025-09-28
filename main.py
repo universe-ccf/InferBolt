@@ -20,7 +20,16 @@ SKILL_LABELS = {
     "steelman": "强化论证",
     "x_exam": "交叉质询",
     "counterfactual": "反事实挑战",
+
+    "luma_story": "故事生成",
+    "luma_reframe": "正向重构",
+    "luma_roleplay": "陪伴扮演",
+
+    "aris_reverse": "逆向挑战",
+    "aris_practice": "互动练习",
+    "aris_bimap": "双向映射"
 }
+
 
 
 # === 加载角色配置===
