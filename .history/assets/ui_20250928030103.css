@@ -1,0 +1,44 @@
+/* assets/ui.css —— 科技感，暗蓝灰玻璃态 */
+:root {
+    --bg: #2b5392;            /* 背景深蓝灰 */
+    --fg: #fcfcfc;            /* 前景文字 */
+    --glass: rgba(255,255,255,0.06);
+    --stroke: rgba(255,255,255,0.10);
+    --accent: #7c9eff;        /* 点缀蓝紫 */
+    --ok: #5ee6a7;            /* 成功薄荷绿 */
+    --warn: #ffd166;          /* 提醒黄 */
+  }
+  .gradio-container{ background: var(--bg); color: var(--fg); }
+  /* 所有文字都提亮 */
+  /* .gradio-container *{ color: var(--fg); }  */
+
+  .gradio-container h1,h2,h3,h4,h5,h6{ color: var(--fg); }
+  
+  /* 聊天框容器与四角徽标 */
+  #chatwrap{ position: relative; }
+  #chatbox{ border-radius: 16px !important; background: var(--glass) !important;
+            border: 1px solid var(--stroke) !important; }
+  .badge{ position:absolute; padding:6px 10px; font-size:12px; border-radius:12px;
+          background: rgba(30,34,42,.7); border:1px solid var(--stroke); backdrop-filter: blur(8px); }
+  #status_badge{ top:10px; left:12px; }
+  #skill_badge { top:10px; right:12px; }
+  #latency_badge{ bottom:10px; right:12px; display:none; } /* 预留：延迟等 */
+  
+  /* 顶部条与按钮 */
+  #header_bar{ margin-bottom: 8px; }
+  #header_title{ font-size:20px; line-height:1.2; }
+  #header_sub{ opacity:.7; font-size:13px; margin-top:2px; }
+  
+  /* 右侧抽屉（简易版） */
+  #drawer{ border-left:1px solid var(--stroke); background: rgba(0,0,0,.25); padding:12px; }
+  #drawer h4{ margin:6px 0 8px; }
+  #right_card{ background: var(--glass); border:1px solid var(--stroke); border-radius:12px; padding:10px; }
+  
+  /* 底部统一输入栏 */
+  #input_row .gr-textbox textarea{ height:58px !important; }
+  #input_row .gr-button{ height:58px; }
+  #mic_btn{ background: rgba(124,158,255,.12); border:1px solid var(--accent); }
+  
+  /* 隐藏 Gradio 自带的页脚/设置/“Built with Gradio”/API */
+  footer, [data-testid="built-with"], [data-testid="block-settings"] { display:none !important; }
+  

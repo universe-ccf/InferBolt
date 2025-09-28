@@ -4,9 +4,9 @@ import os, json, requests, re
 from typing import List, Dict, Any
 from core.types import Message
 from config import settings
-import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+
 
 class LLMClient:
     def __init__(self, model: str | None = None, temperature: float = None,
@@ -19,7 +19,7 @@ class LLMClient:
             raise RuntimeError("API_KEY 未配置，请在 .env 中设置 API_KEY=")
         self._chat_url = f"{self.base_url}/chat/completions"
 
-        # ↑ 带重试的 Session（连超时/读超时/502/503/504 自动重试）
+        # 带重试的 Session（连超时/读超时/502/503/504 自动重试）
         self.session = requests.Session()
         retry = Retry(
             total=settings.HTTP_MAX_RETRIES,
@@ -33,6 +33,22 @@ class LLMClient:
         self.session.mount("https://", adapter)
         self.session.mount("http://", adapter)
 
+    def _ensure_openai_messages(self, messages):
+        """把 List[Message] 或 List[dict] 统一转为 [{'role':'user','content':'...'}]"""
+        out = []
+        for m in messages:
+            if isinstance(m, dict):
+                role = m.get("role"); content = m.get("content")
+            else:
+                # dataclass Message
+                role = getattr(m, "role", None)
+                content = getattr(m, "content", None)
+            if not role or content is None:
+                # 跳过异常项，或你也可 raise
+                continue
+            out.append({"role": str(role), "content": str(content)})
+        return out
+
     def _to_openai_messages(self, messages: List[Message]) -> List[Dict[str, str]]:
         # 我们内部 Message 的字段名与 OpenAI 兼容，可直接映射
         out = []
@@ -41,165 +57,138 @@ class LLMClient:
         return out
 
     # 通用对话补全
-    def complete(self, messages: List[Message], max_tokens: int = 512) -> str:
+    def complete(self, messages: List[Dict[str, str]], max_tokens: int = 512, stream: bool = False) -> str:
+        """
+        OpenAI Chat Completions 兼容。
+        - stream=False：普通 JSON；返回 reply 字符串
+        - stream=True ：SSE（Server-Sent Events）；只拼接 delta.content；过滤控制字符避免乱码
+        """
+        messages = self._ensure_openai_messages(messages)
+        url = f"{self.base_url}/chat/completions"
+        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
         payload = {
             "model": self.model,
-            "messages": self._to_openai_messages(messages),
-            "temperature": self.temperature,
+            "messages": messages,
+            "temperature": getattr(settings, "LLM_TEMPERATURE", 0.7),
             "max_tokens": max_tokens,
-            "stream": False
+            "stream": bool(stream),
         }
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
-        }
+        timeout = getattr(settings, "REQUEST_TIMEOUT", 30)
 
-        try:
-            # 第一次正常请求
-            resp = self.session.post(
-                self._chat_url, headers=headers, json=payload, timeout=settings.REQUEST_TIMEOUT
-            )
-            resp.raise_for_status()
-            data = resp.json()
-            if isinstance(data, dict) and "choices" in data and data["choices"]:
-                choice = data["choices"][0]
-                if "message" in choice and "content" in choice["message"]:
-                    return choice["message"]["content"]
-                if "text" in choice:
-                    return choice["text"]
-
-            print("Unexpected LLM response:", resp.text[:500])
-            return "（抱歉，模型响应解析失败。）"
-
-        except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout) as e:
-            # 降级重试：收紧 max_tokens、温度、截断历史，以更快返回
-            print("Timeout, retrying with a lighter request:", type(e).__name__)
+        if not stream:
+            # 非流式
             try:
-                lite_payload = dict(payload)
-                lite_payload["max_tokens"] = min(256, max_tokens)
-                lite_payload["temperature"] = 0.3
-                resp2 = self.session.post(
-                    self._chat_url, headers=headers, json=lite_payload,
-                    timeout=(settings.CONNECT_TIMEOUT, settings.READ_TIMEOUT + 10)  # 第二次读超时再放宽一点
-                )
-                resp2.raise_for_status()
-                data = resp2.json()
-                if isinstance(data, dict) and "choices" in data and data["choices"]:
-                    choice = data["choices"][0]
-                    if "message" in choice and "content" in choice["message"]:
-                        return choice["message"]["content"]
-                    if "text" in choice:
-                        return choice["text"]
-                print("Unexpected LLM response (retry):", resp2.text[:500])
-                return "（抱歉，模型响应解析失败。）"
-            except Exception as e2:
-                print("LLM timeout retry failed:", type(e2).__name__, str(e2)[:200])
-                return "（抱歉，模型接口读取超时，请稍后再试。）"
-
-        except requests.exceptions.RequestException as e:
-            # 其他HTTP错误（含 429/5xx，经 Session 已自动重试）
-            body = getattr(e.response, "text", "")
-            print("LLM HTTP error:", body[:300] or str(e))
-            return "（抱歉，模型接口暂时不可用，请稍后再试。）"
-
-        except Exception as e:
-            print("LLM parse error:", type(e).__name__, e)
-            return "（抱歉，模型响应异常。）"
+                resp = self.session.post(url, headers=headers, json=payload, timeout=timeout)
+                resp.raise_for_status()
+                js = resp.json()
+                choice = (js.get("choices") or [{}])[0]
+                msg = choice.get("message") or {}
+                return (msg.get("content") or "").strip()
+            except requests.exceptions.RequestException as e:
+                body = getattr(e.response, "text", "") if hasattr(e, "response") else str(e)
+                raise RuntimeError(f"LLM HTTP error: {body[:500]}")
+            except ValueError:
+                # 200 但不是 JSON，说明是 SSE 被误开（或服务端异常）
+                txt = (resp.text or "").strip()
+                raise RuntimeError(f"LLM HTTP non-JSON (status={resp.status_code}): {txt[:500]}")
+        else:
+            # 流式（SSE）
+            try:
+                # 加 Accept 头
+                headers = {
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                    "Accept": "text/event-stream",
+                }
+                resp = self.session.post(url, headers=headers, json=payload, timeout=timeout, stream=True)
+                # 4xx/5xx 直接抛错
+                if resp.status_code >= 400:
+                    raise RuntimeError(f"LLM HTTP error (stream, status={resp.status_code}): {(resp.text or '')[:500]}")
+                # 逐行解析 data: {...}
+                def _clean_piece(s: str) -> str:
+                    # 只保留可打印字符与换行，防止乱码（包含中英文）
+                    return "".join(ch for ch in s if ch == "\n" or ch >= " ")
+                full = []
+                # 不自动解码，自己按 utf-8 解
+                for raw in resp.iter_lines(decode_unicode=False):
+                    if not raw:
+                        continue
+                    try:
+                        line = raw.decode("utf-8", errors="ignore").strip()
+                    except Exception:
+                        continue
+                    if not line.startswith("data:"):
+                        continue
+                    data_str = line[5:].strip()
+                    if data_str == "[DONE]":
+                        break
+                    try:
+                        chunk = json.loads(data_str)
+                        ch = (chunk.get("choices") or [{}])[0]
+                        delta = ch.get("delta") or {}
+                        piece = delta.get("content") or ""
+                        if piece:
+                            full.append(_clean_piece(piece))
+                    except Exception:
+                        # 跳过非 JSON 或包含推理字段的片段
+                        continue
+                return "".join(full).strip()
+            except requests.exceptions.RequestException as e:
+                body = getattr(e.response, "text", "") if hasattr(e, "response") else str(e)
+                raise RuntimeError(f"LLM HTTP error (stream): {body[:500]}")
     
-    # def complete(self, messages: List[Message], max_tokens: int = 512) -> str:
-    #     payload = {
-    #         "model": self.model,
-    #         "messages": self._to_openai_messages(messages),
-    #         "temperature": self.temperature,
-    #         "max_tokens": max_tokens,
-    #         "stream": False
-    #     }
-    #     headers = {
-    #         "Authorization": f"Bearer {self.api_key}",
-    #         "Content-Type": "application/json"
-    #     }
-    #     try:
-    #         resp = requests.post(self._chat_url, headers=headers, json=payload, timeout=settings.REQUEST_TIMEOUT)
-    #         resp.raise_for_status()
-    #         data = resp.json()
-    #         # —— 某些厂商兼容层有细微差异，这里更稳一点：
-    #         if isinstance(data, dict) and "choices" in data and data["choices"]:
-    #             choice = data["choices"][0]
-    #             # OpenAI 兼容通常是 message.content；部分实现也可能是 delta/content 或 text
-    #             if "message" in choice and "content" in choice["message"]:
-    #                 return choice["message"]["content"]
-    #             if "text" in choice:
-    #                 return choice["text"]
-    #         # 打印帮助排查
-    #         print("Unexpected LLM response:", resp.text[:500])
-    #         return "（抱歉，模型响应解析失败。）"
-    #     except requests.exceptions.RequestException as e:
-    #         print("LLM HTTP error:", getattr(e.response, "text", str(e)))
-    #         return "（抱歉，模型接口暂时不可用，请稍后再试。）"
-    #     except Exception as e:
-    #         print("LLM parse error:", type(e).__name__, e)
-    #         return "（抱歉，模型响应异常。）"
+    def complete_chunks(self, messages, max_tokens=512):
+        """
+        逐片段产出文本（生成器）。调用方式：
+        for piece in llm.complete_chunks(msgs): ...
+        """
+        messages = self._ensure_openai_messages(messages)
+        url = f"{self.base_url}/chat/completions"
+        headers = {"Authorization": f"Bearer {self.api_key}", 
+                   "Content-Type": "application/json",
+                   "Accept": "text/event-stream",     # 关键：明确 SSE
+                   }
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": getattr(settings, "LLM_TEMPERATURE", 0.7),
+            "max_tokens": max_tokens,
+            "stream": True,
+        }
+        try:
+            resp = self.session.post(url, headers=headers, json=payload,
+                                    timeout=getattr(settings,"REQUEST_TIMEOUT",30),
+                                    stream=True)
+            resp.raise_for_status()
+            def _clean(s):
+                return "".join(ch for ch in s if ch == "\n" or ch >= " ")
+            
+            # 不自动解码，自己解码
+            for raw in resp.iter_lines(decode_unicode=False):
+                if not raw: 
+                    continue
+                try:
+                    line = raw.decode("utf-8", errors="ignore").strip()
+                except Exception:
+                    continue
 
+                if not line.startswith("data:"):
+                    continue
+                data_str = line[5:].strip()
+                if data_str == "[DONE]":
+                    break
+                try:
+                    chunk = json.loads(data_str)
+                    delta = (chunk.get("choices") or [{}])[0].get("delta") or {}
+                    piece = delta.get("content") or ""
+                    if piece:
+                        yield _clean(piece)
+                except Exception:
+                    continue
+        except requests.exceptions.RequestException as e:
+            body = getattr(e.response,"text","") if hasattr(e,"response") else str(e)
+            raise RuntimeError(f"LLM HTTP error (stream): {body[:400]}")
 
-    # def classify(self, text: str, schema: Dict[str, Any]) -> Dict[str, Any]:
-    #     """
-    #     让模型只输出JSON；解析失败时兜底为 unknown。
-    #     schema 例：
-    #     {"intent":"", "skill":"steelman|x_exam|counterfactual|none", "confidence":0.0}
-    #     """
-    #     """
-    #     返回结构：
-    #     {
-    #     "intent": str,
-    #     "skill": Optional[str],
-    #     "confidence": float,
-    #     "_debug": {
-    #         "raw": str,             # LLM 原样输出
-    #         "parsed": dict,         # 解析后的JSON（若成功）
-    #         "candidate": str        # 从 raw 提取的大括号片段
-    #     }
-    #     }
-    #     """  
-
-    #     system = Message(role="system", content=(
-    #         "你是一个严格的JSON分类器。"
-    #         "只输出一个JSON对象，不要任何多余文字或解释。"
-    #         "字段: intent(中文短语), skill(steelman|x_exam|counterfactual|none), confidence(0~1浮点)。"
-    #     ))
-    #     user = Message(
-    #         role="user",
-    #         content=f"请根据输入文本判断用户意图，并按schema输出JSON。输入：{text}\n"
-    #                 f"schema={json.dumps(schema, ensure_ascii=False)}"
-    #     )
-    #     raw = self.complete([system, user], max_tokens=200)
-
-    #     parsed = {}
-    #     candidate = "{}"
-    #     # 从返回文本中提取JSON（防脏输出）
-    #     try:
-    #         # 优先用贪婪匹配最后一个大括号块
-    #         m = re.search(r"\{.*\}", raw, re.S)
-    #         candidate = m.group(0) if m else "{}"
-    #         parsed = json.loads(candidate)
-    #     except Exception:
-    #         parsed = {}
-        
-    #     intent = parsed.get("intent", "unknown")
-    #     skill = parsed.get("skill", None)
-
-    #     try:
-    #         conf = float(parsed.get("confidence", 0.0))
-    #     except Exception:
-    #         conf = 0.0
-
-    #     # 兜底规范化
-    #     if skill not in {"steelman", "x_exam", "counterfactual"}:
-    #         skill = None
-
-    #     result = {"intent": intent, "skill": skill, "confidence": conf}
-    #     if settings.DEBUG:
-    #         result["_debug"] = {"raw": raw, "parsed": parsed, "candidate": candidate}
-    #     return result
     
     def classify(self, text: str) -> Dict[str, Any]:
         """
@@ -235,17 +224,12 @@ class LLMClient:
             "3) 所有置信度是0~1之间的小数，总和=1。\n"
         )
 
-        system = Message(role="system", content=sys_prompt)
-        user = Message(
-            role="user",
-            content=f"输入文本：{text}\n请仅按上述schema输出JSON。"
-        )
+        
+        # 不走自定义 Message 了，彻底避免 JSON 序列化错误
+        system = {"role": "system", "content": sys_prompt}
+        user   = {"role": "user",   "content": f"输入文本：{text}\n请仅按上述schema输出JSON。"}
 
-        raw = self.complete([system, user], max_tokens=220)
-        # raw = self.session.post(self._chat_url, 
-        #                         headers=headers, 
-        #                         json=payload,
-        #                         timeout=(settings.CONNECT_TIMEOUT, min(settings.READ_TIMEOUT, 15)))
+        raw = self.complete([system, user], max_tokens=220, stream=False)
 
         # 解析：从 raw 中抽取 JSON
         parsed, candidate_json = {}, "{}"
@@ -297,12 +281,3 @@ class LLMClient:
         if settings.DEBUG:
             result["_debug"] = {"raw": raw, "candidate": candidate_json, "parsed": parsed}
         return result
-    
-
-    
-
-
-
-    
-    
-

@@ -3,12 +3,17 @@ from __future__ import annotations
 import os, io, uuid
 import gradio as gr
 from clients.llm_client import LLMClient
-from core.state import SessionState, reset_session
-from core.types import RoleConfig
+from core.state import SessionState, reset_session, append_turn 
+from core.types import RoleConfig, Message
 from core.roles import load_all_roles
 import json
 import numpy as np
 from core.pipeline import respond, respond_voice
+from core.pipeline import voice_sentence_loop, assemble_messages, build_system_prompt
+from clients.asr_ws_client import ASRWsClient                          
+from clients.tts_client import TTSClient         
+from config import settings
+import traceback
 
 
 SKILL_LABELS = {
@@ -62,6 +67,45 @@ def on_user_submit_text(user_text: str,
         return [(user_text, "抱歉，内部出现错误，正在修复。")], "—", "—", session
 
 
+def on_user_submit_text_stream(user_text: str,
+                               session: SessionState,
+                               role_name: str,
+                               llm: LLMClient,
+                               debug_on: bool,
+                               chatbot_hist: list[tuple[str, str]]):
+    """
+    真·流式：分片直刷
+    """
+    try:
+        if not isinstance(chatbot_hist, list):
+            chatbot_hist = []
+        # 增量直刷（更快）
+        ui_msgs = list(chatbot_hist)
+        ui_msgs.append((user_text, ""))  # 占位
+        yield ui_msgs, "—", "—", session
+
+        role = load_role_config(role_name)
+        history = session.messages if hasattr(session, "messages") else []
+        msgs = assemble_messages(build_system_prompt(role), history, user_text)
+
+        buf = []
+        for piece in llm.complete_chunks(msgs, max_tokens=settings.MAX_TOKENS_RESPONSE):
+            buf.append(piece)
+            ui_msgs[-1] = (user_text, "".join(buf))
+            yield ui_msgs, "—", "—", session
+
+        # 完成后把这一轮写回 state（用 append_turn）
+        append_turn(session, Message(role="user", content=user_text), Message(role="assistant", content="".join(buf)), settings.MAX_ROUNDS)
+        yield ui_msgs, "—", "—", session
+
+    except Exception:
+        traceback.print_exc()
+        if not isinstance(chatbot_hist, list):
+            chatbot_hist = []
+        chatbot_hist.append((user_text, "抱歉，内部错误。"))
+        yield chatbot_hist, "—", "—", session
+
+
 # === 回调：重置会话 ===
 def on_reset(session: SessionState):
     reset_session(session)
@@ -99,6 +143,8 @@ def on_user_submit_audio(audio_tuple, session: SessionState, role_name: str, llm
                 debug_md = "### 路由调试\n```json\n" + json.dumps(rd, ensure_ascii=False, indent=2) + "\n```"
 
         audio_path = turn.audio_bytes  # 现在承载的是文件路径
+        if audio_path:
+            audio_path = os.path.normpath(audio_path).replace("\\", "/")  # <— 新增
         return chat_pair, skill_tag, debug_md, audio_path, session
 
     except Exception:
@@ -108,84 +154,257 @@ def on_user_submit_audio(audio_tuple, session: SessionState, role_name: str, llm
         return [("🎤(语音)", "抱歉，语音处理异常。")], "—", debug_md, None, session
 
 
+# “生成器式”的语音回调
+def on_user_submit_audio_stream(audio_tuple,
+                                chatbot_cur: list,
+                                session: SessionState,
+                                role_name: str,
+                                llm: LLMClient,
+                                debug_on: bool,
+                                use_custom_voice: bool,
+                                custom_voice: str,
+                                custom_speed: float):
+    """
+    生成器：一次录音 => 句级快速反馈。
+    每次 yield 更新：Chatbot(累积)、技能标签、调试面板、Audio(单句path)、Status、Session
+    """
+
+    # 兜底：没音频
+    if audio_tuple is None:
+        # 不要清空聊天框；只更新状态徽标，其他都不变
+        yield gr.update(), None, "❗未接收音频", "—", session
+        return
+
+    # Gradio type="numpy" 形态：(sr, np.ndarray[float32, -1..1])
+    try:
+        sr, audio_np = audio_tuple
+    except Exception:
+        yield [], None, "❗音频格式异常", "—", session
+        return
+
+    if getattr(audio_np, "dtype", None) is not np.float32:
+        audio_np = audio_np.astype(np.float32)
+        maxv = float(np.max(np.abs(audio_np)) or 1.0)
+        audio_np = audio_np / max(1.0, maxv)
+
+    # 角色 + 会话级音色覆盖
+    role = load_role_config(role_name)
+    if use_custom_voice:
+        tts_pref = getattr(role, "tts", {}) or {}
+        if custom_voice:
+            tts_pref["voice_type"] = custom_voice
+        if custom_speed:
+            tts_pref["speed_ratio"] = float(custom_speed)
+        setattr(role, "tts", tts_pref)
+
+    # 客户端
+    asr = ASRWsClient()
+    tts = TTSClient()
+
+    # UI端累积对话,从已有历史开始
+    ui_msgs = list(chatbot_cur or [])
+
+    # 逐句生成：ASR → 切句 → 短答 → TTS → yield
+    gen = voice_sentence_loop(audio_np=audio_np,
+                              sample_rate=sr,
+                              state=session,
+                              role=role,
+                              llm_client=llm,
+                              asr_client=asr,
+                              tts_client=tts)
+
+    for step in gen:
+        for who, txt in step.get("chat_add", []):
+            if who == "user":
+                # 若最后一条是“未配对”的用户占位，则覆盖；否则追加
+                if ui_msgs and ui_msgs[-1][0] is not None and ui_msgs[-1][1] is None:
+                    ui_msgs[-1] = (txt, None)
+                else:
+                    ui_msgs.append((txt, None))
+            elif who == "assistant":
+                if ui_msgs and ui_msgs[-1][0] is not None and ui_msgs[-1][1] is None:
+                    ui_msgs[-1] = (ui_msgs[-1][0], txt)
+                else:
+                    ui_msgs.append((None, txt))
+
+        # 生成 HTML 自动播（如果本步有音频文件）
+        audio_path = step.get("audio_path")
+        if audio_path:
+            # 注意转正斜杠
+            src = str(audio_path).replace("\\", "/")
+            # # 方案B：直接HTML自动播，隐藏控件
+            # audio_html = f"""<audio src="{src}" autoplay playsinline style="display:none"></audio>"""
+
+        yield ui_msgs, audio_path, step.get("status", ""), step.get("skill_label", "—"), session
+
+    
+def _load_voices():
+    try:
+        tts = TTSClient()
+        items = tts.list_voices()
+        labels, mapping = [], {}
+        for it in items:
+            vt = it.get("voice_type") or ""
+            name = it.get("voice_name") or vt
+            cat = it.get("category", "")
+            label = f"{name} ({vt})" if name else vt
+            if cat:
+                label = f"{label} · {cat}"
+            labels.append(label); mapping[label] = vt
+        default_value = labels[0] if labels else None
+        # 一次更新 choices 与默认值，避免“value 不在 choices 中”的报错
+        return gr.update(choices=labels, value=default_value), mapping
+    except Exception:
+        return gr.update(choices=[], value=None), {}
+
+def _label_to_voice(label: str, mapping: dict):
+    return mapping.get(label or "", "")
+
+def _on_reset(session: SessionState):
+    reset_session(session)
+    # 依次返回：chatbot 空列表、status 文案、skill 文案、audio 停止、session
+    return [], "准备就绪", "—", "", session
+
+
+CSS_PATH = os.path.join(os.path.dirname(__file__), "assets", "ui.css")
+CUSTOM_CSS = open(CSS_PATH, "r", encoding="utf-8").read() if os.path.exists(CSS_PATH) else ""
+THEME = gr.themes.Soft(primary_hue="blue", secondary_hue="cyan")  # 中性不压字
+
 # === 组装 UI ===
 def build_ui():
-    with gr.Blocks(title="AI 角色扮演 · 思辨训练营(MVP)") as demo:
-        gr.Markdown("## AI 角色扮演（思辨训练营）")
+    with gr.Blocks(title="Voicery · 思辨训练营", theme=THEME, css=CUSTOM_CSS) as demo:
+        # 顶部：左标题 + 右上“用户信息”
+        with gr.Row():
+            with gr.Column(elem_id="header_bar", scale=5):
+                gr.Markdown("<div id='header_title'> Voicery </div>"
+                            "<div id='header_sub'>  声音魔法</div>")
+            with gr.Column(elem_id="user_bar", scale=1):
+                gr.Markdown("### 👤  匿名用户 ")
+
 
         # 全局状态：会话 + LLM 客户端（持久化在 Gradio 的 State 里）
         session_state = gr.State(SessionState(session_id=str(uuid.uuid4())))
         llm_client = gr.State(LLMClient())   # 使用 .env/settings.py 配好的 API/模型
+        drawer_visible = gr.State(False)
 
         with gr.Row():
-            role_dd = gr.Dropdown(choices=list(ROLES_CACHE.keys()),
-                      value=list(ROLES_CACHE.keys())[0],
-                      label="选择角色")
-            debug_ck = gr.Checkbox(label="调试模式", value=True)
-            reset_btn = gr.Button("重置会话", variant="secondary")
+            with gr.Column(scale=1):
+                role_dd = gr.Dropdown(choices=list(ROLES_CACHE.keys()),
+                        value=list(ROLES_CACHE.keys())[0],
+                        label="选择角色")
+            with gr.Column(scale=6):
+                gr.Markdown("")
+            with gr.Column(scale=1):
+                settings_btn = gr.Button("⚙️ 高级设置", variant="secondary")
+                reset_btn = gr.Button("重置会话", variant="secondary")
 
-        chatbot = gr.Chatbot(label="对话区", height=350)
+        voices_map = gr.State({})
 
-        gr.Markdown("AI也会犯错，请检查重要信息！")
+        # 中间主体：左“聊天框（含角标）” + 右“抽屉”（默认隐藏）
+        with gr.Row():
+            with gr.Column(scale=4):
+                    chatbot = gr.Chatbot(label=None, height=405, elem_id="chatbox")
+            with gr.Column(scale=2, visible=False, elem_id="drawer") as drawer:
+                with gr.Group(elem_id="right_card"):
+                    gr.Markdown("#### 面板")
+                    # 调试开关 & 信息
+                    debug_ck = gr.Checkbox(label="调试模式", value=False)
+                    debug_panel = gr.Markdown(value="（调试输出显示在此）")
 
-        # 技能状态指示组件
-        skill_info = gr.Markdown(value="—", label="技能状态")
+                with gr.Group(elem_id="right_card"):
+                    gr.Markdown("#### 语音参数")
+                    use_custom_voice = gr.Checkbox(label="启用自定义音色", value=True)
+                    voice_label_dd   = voice_label_dd   = gr.Dropdown(
+                        label="音色（从官方列表加载）",
+                        choices=[], value=None, allow_custom_value=True
+                    )
+                    custom_voice  = gr.Textbox(label="voice_type（隐藏绑定）", visible=False)
+                    custom_speed  = gr.Slider(0.7, 1.3, value=0.95, step=0.01, label="speed_ratio（0.7~1.3）")
 
-        debug_panel = gr.Markdown(value="—", label="调试信息")
+        # 底部统一输入区
+        with gr.Row(elem_id="input_row"):
+            with gr.Column(scale=6):
+                txt_in = gr.Textbox(label=None, show_label=False,
+                                    placeholder="输入文字，或点右侧 🎙️ 说话…", lines=3)
+                send_btn = gr.Button("发送", variant="primary", elem_id="send_btn")
+            with gr.Column(scale=2):
+                mic = gr.Audio(sources=["microphone"], type="numpy", label=None, show_label=False, visible=True)
+            with gr.Column(scale=1):
+                with gr.Row():
+                    re_record_btn = gr.Button("🔁 重录", variant="secondary", elem_id="mic_btn")
+                with gr.Row():
+                    stop_btn = gr.Button("⏹ 停播", variant="secondary")
+            
+        with gr.Row():
+            gr.Markdown("<div style='opacity:.6'>        ⚠️ Voicery 可能出错, 请核验关键信息</div>")
 
-        with gr.Tab("文本对话"):
-            with gr.Row():
-                txt_in = gr.Textbox(label="输入你的话", 
-                                    placeholder="例：强化论证 / 交叉质询 / 反事实挑战", 
-                                    lines=2)
-                send_btn = gr.Button("发送", variant="primary")
 
-        with gr.Tab("语音对话"):
-            with gr.Row():
-                mic = gr.Audio(sources=["microphone", "upload"], type="numpy", label="录音或上传（单声道）")
-                send_v = gr.Button("发送语音", variant="primary")
-                audio_out = gr.Audio(label="语音回复（TTS）", type="filepath")
+        with gr.Row():
+            with gr.Column(scale=1):
+                # latency_badge = gr.Markdown("")
+                status_badge = gr.Markdown("准备就绪", elem_classes=["badge"], elem_id="status_badge")
+                skill_badge  = gr.Markdown("—", elem_classes=["badge"], elem_id="skill_badge")
+            with gr.Column(scale=1):
+                # 播放器：每句产出直接 autoplay
+                audio_out = gr.Audio(type="filepath", autoplay=True, visible=True)
+        
+        # 高级设置：开/合 + 拉取音色
+        def _toggle_drawer_state(v: bool):
+            return not v
+        def _apply_drawer(v: bool):
+            return gr.update(visible=v)
 
-            # 高级设置（会话覆盖）
-            with gr.Accordion("高级设置（会话覆盖角色音色）", open=False):
-                use_custom_voice = gr.Checkbox(label="使用自定义音色", value=False)
-                custom_voice = gr.Textbox(label="voice_type（留空则用角色默认）", placeholder="例如：qiniu_zh_male_cxkjns")
-                custom_speed = gr.Slider(0.6, 1.3, value=0.92, step=0.02, label="speed_ratio（0.6~1.3）")
+        settings_btn.click(
+            _toggle_drawer_state, inputs=[drawer_visible], outputs=[drawer_visible]
+        ).then(
+            _apply_drawer, inputs=[drawer_visible], outputs=[drawer]
+        ).then(
+            _load_voices, inputs=None, outputs=[voice_label_dd, voices_map]
+        )
 
+        # 选择某音色 -> 写入隐藏的 custom_voice（调用链保持不变）
+        voice_label_dd.change(_label_to_voice, inputs=[voice_label_dd, voices_map], outputs=[custom_voice])
+
+        reset_btn.click(
+            _on_reset,
+            inputs=[session_state],
+            outputs=[chatbot, status_badge, skill_badge, audio_out, session_state]
+        ).then(
+            lambda: "", None, txt_in
+        )
+
+
+        def _clear_mic_and_audio():
+            # 仅清空录音输入与播放器；不修改聊天历史
+            return None, None, "🎙️ 已清空，可以重新录制", "—"
+
+        re_record_btn.click(
+            _clear_mic_and_audio,
+            inputs=None,
+            outputs=[mic, audio_out, status_badge, skill_badge]
+        )
+
+        mic.change(
+            fn=on_user_submit_audio_stream,
+            inputs=[mic, chatbot, session_state, role_dd, llm_client, debug_ck, use_custom_voice, custom_voice, custom_speed],
+            outputs=[chatbot, audio_out, status_badge, skill_badge, session_state]   # ← 注意：输出目标变了
+        )
 
         # 文本事件
         send_btn.click(
-            fn=on_user_submit_text,
-            inputs=[txt_in, session_state, role_dd, llm_client, debug_ck],
-            outputs=[chatbot, skill_info, debug_panel, session_state]
-        ).then(  # 发送后清空输入框
-            lambda: "", None, txt_in
-        )
+            fn=on_user_submit_text_stream,
+            inputs=[txt_in, session_state, role_dd, llm_client, debug_ck, chatbot],
+            outputs=[chatbot, skill_badge, debug_panel, session_state]   # 技能徽标=skill_badge
+        ).then(lambda: "", None, txt_in)# 发送后清空输入框
+        
 
         # 语音事件
-        send_v.click(
-            fn=on_user_submit_audio,
-            inputs=[mic, session_state, role_dd, llm_client, debug_ck, use_custom_voice, custom_voice, custom_speed],
-            outputs=[chatbot, skill_info, debug_panel, audio_out, session_state]
-        )
+        def _stop_play():
+            return "", "⏹ 已停止播放"
 
-        reset_btn.click(
-            fn=on_reset,
-            inputs=[session_state],
-            outputs=[session_state]
-        ).then(
-            lambda: None, None, chatbot
-        ).then(
-            lambda: "—", None, skill_info  # 重置技能指示
-        ).then(
-            lambda: "—", None, debug_panel
-        ).then(
-            lambda: None, None, audio_out
-        ).then(
-            lambda: "", None, txt_in
-        )
+        stop_btn.click(_stop_play, outputs=[audio_out, status_badge])
 
-    demo.launch()
+    demo.launch(show_api=False)   # “通过 API 使用”不显示；其它通过 CSS 已隐藏
 
 if __name__ == "__main__":
     build_ui()

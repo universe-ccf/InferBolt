@@ -1,0 +1,96 @@
+/* assets/ui.css —— 科技感，暗蓝灰玻璃态 */
+:root {
+    --bg: #ffffff;            /* 背景深蓝灰 */
+    --fg: #222222;            /* 前景文字 */
+    --glass: rgba(121, 152, 238, 0.01);
+    --stroke: rgba(124,158,255,0.15);
+    --accent: #4a80ff;        /* 点缀蓝紫 */
+    --ok: #5ee6a7;            /* 成功薄荷绿 */
+    --warn: #ffd166;          /* 提醒黄 */
+  }
+  .gradio-container{ background: var(--bg); color: var(--fg); }
+  /* 所有文字都提亮 */
+  /* .gradio-container *{ color: var(--fg); }  */
+
+  .gradio-container h1,h2,h3,h4,h5,h6{ color: var(--fg); }
+  
+  /* 聊天框容器与四角徽标 */
+  #chatwrap{ position: relative; }
+  /* 16 */
+  #chatbox{ border-radius: 12px !important; background: var(--glass) !important;
+            border: 1px solid var(--stroke) !important; }
+  /* rgba(30,34,42,.7) */
+  /* .badge{ position:absolute; padding:6px 10px; font-size:12px; border-radius:12px;
+          background: var(--glass); border:1px solid var(--stroke); backdrop-filter: blur(10px); } */
+  /* 左上 */
+  /* #status_badge{ top:10px; left:12px; }   */
+  /* 右上 */
+  /* #skill_badge { top:10px; right:12px; }   */
+  /* 右下，默认隐藏 */
+  /* #latency_badge{ bottom:10px; right:12px; display:none; }  */
+
+  /* #status_badge{ bottom:25px; right:12px; display:block;}  
+  #skill_badge { bottom:40px; right:12px; display:block;}  
+  #latency_badge{ bottom:10px; right:12px; display:block;}  */
+  
+  /* 顶部条与按钮 */
+  #header_bar {
+        display: flex;
+        align-items: center;   /* 垂直方向居中 */
+        justify-content: start; /* 左对齐 */
+        color: #85c0e2cc;
+      }
+  #user_bar {
+        display: flex;
+        align-items: center;   /* 垂直方向居中 */
+        justify-content: end; /* 右对齐 */
+        color: #373b3b8f;
+    }
+  #header_title {
+        font-size: 25px;
+        font-weight: bold;
+        margin: 0;
+      }
+  #header_buttons {
+        display: flex;
+        gap: 8px;  /* 按钮之间的间距 */
+      }
+  #header_buttons .gr-button {
+        height: 36px;
+        padding: 0 16px;
+        font-size: 14px;
+      }
+  #header_sub{ opacity:.7; font-size:13px; margin-top:2px; }
+  
+  /* 右侧抽屉（简易版） */
+  #drawer{ border-left:1px solid var(--stroke); background: var(--glass); padding:12px; }
+  #drawer h4{ margin:6px 0 8px; }
+  #right_card{ background: var(--glass); border:1px solid var(--stroke); border-radius:12px; padding:10px; }
+  
+  /* 底部统一输入栏 */
+  #input_row {
+        display: flex;
+        align-items: center;   /* 保持上下居中 */
+        gap: 10px;              /* 组件间距 */
+      }
+      
+  #input_row .gr-textbox {
+        flex: 1;   /* 占满剩余空间 */
+      }
+      
+  #input_row .gr-button {
+        flex: 0 0 30px; /* 固定按钮宽度 120px，你可以改成 100/150 等 */
+      }
+  
+  #mic_btn {
+        background: val(--glass);
+      }
+  /* #mic_btn {
+        flex: 0 0 60px; 
+        background: val(--glass);
+        border:1px solid var(--accent);
+      } */
+  
+  /* 隐藏 Gradio 自带的页脚/设置/“Built with Gradio”/API */
+  footer, [data-testid="built-with"], [data-testid="block-settings"] { display:none !important; }
+  

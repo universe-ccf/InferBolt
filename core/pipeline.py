@@ -1,6 +1,6 @@
 # core/pipeline.py
 from __future__ import annotations
-from typing import List, Dict, Optional, Any
+from typing import Generator, List, Dict, Optional, Any
 from .types import Message, RoleConfig, TurnResult, SkillResult
 from .state import SessionState, get_recent_messages, append_turn
 from .dispatcher import route
@@ -13,6 +13,8 @@ import time
 from clients.asr_client import ASRClient
 from clients.tts_client import TTSClient
 from clients.asr_ws_client import ASRWsClient
+from utils.textseg import split_for_tts
+import os
 
 
 # 根据角色配置生成system prompt（口吻、禁区、格式偏好）
@@ -66,7 +68,7 @@ def respond(user_text: str, state: SessionState, role: RoleConfig, llm_client, m
         system_prompt = build_system_prompt(role)
         history = get_recent_messages(state, max_rounds=max_rounds)
         messages = assemble_messages(system_prompt, history, user_text)
-        reply_text = llm_client.complete(messages, max_tokens=settings.MAX_TOKENS_RESPONSE)
+        reply_text = llm_client.complete(messages, max_tokens=settings.MAX_TOKENS_RESPONSE, stream=settings.TEXT_STREAMING)
         append_turn(state, Message(role="user", content=user_text), Message(role="assistant", content=reply_text), max_rounds)
 
         if settings.DEBUG:
@@ -172,3 +174,100 @@ def respond_voice(audio_np, sample_rate, state: SessionState, role: RoleConfig, 
                       data={"route_debug": turn_text.data.get("route_debug"),
                             "voice_used": voice, "speed_used": speed},
                       audio_bytes=tts_res.audio_path)  # 用此字段承载路径
+
+
+# 语音模式下的短回复
+def respond_short(user_text: str, state: SessionState, role: RoleConfig, llm_client) -> TurnResult:
+    """
+    语音模式下的“短回复”：限制为 1-2 句/不超过 MAX_REPLY_CHARS_VOICE。
+    复用你的 build_system_prompt / assemble_messages，只是多加一段约束。
+    """
+    sys_prompt = build_system_prompt(role)
+    limit_note = f"【重要】请用1-2句中文回答，总字数不超过{settings.MAX_REPLY_CHARS_VOICE}字。如需展开，请最后问：要继续吗？"
+    sys_prompt = sys_prompt + "\n" + limit_note
+
+    history = getattr(state, "history", None) or getattr(state, "turns", None) or getattr(state, "messages", None) or []
+    msgs = assemble_messages(sys_prompt, history, user_text)
+
+    # 也可在 user 侧再加一句“请简洁回答”
+    reply = llm_client.complete(msgs, max_tokens=256, stream=False)
+    
+    # 更新会话
+    # 改为显式 push 到 messages：
+    try:
+        if not hasattr(state, "messages") or state.messages is None:
+            state.messages = []
+        state.messages.append(Message(role="user", content=user_text))
+        state.messages.append(Message(role="assistant", content=reply))
+    except Exception:
+        # 容错：不因日志失败影响主流程
+        pass
+    return TurnResult(reply_text=reply, skill=None, data={})
+
+# 句级：一句识别→一句短答→一句TTS→逐句产出
+def voice_sentence_loop(audio_np, sample_rate, state: SessionState, role: RoleConfig, llm_client, asr_client, tts_client) -> Generator[Dict[str, Any], None, None]:
+    """
+    生成器：一次录音 -> ASR -> 按句切 -> 对每句做“短回复+TTS”，逐句 yield 到 UI。
+    yield 字段：chatbot_messages（列表）、session_state、audio_path（每句一个文件）、status_text
+    """
+    t0 = time.time()
+    # 一开始（收到音频）先提示
+    yield {"status": "🧠 正在识别(ASR)...", "chat_add": []}
+
+    # 1) ASR（整段识别）
+    asr_t0 = time.time()
+    asr_res = asr_client.transcribe(audio_np, sample_rate, audio_url=None)
+    asr_t1 = time.time()
+    user_text_all = (asr_res.text or "").strip()
+
+    if not user_text_all:
+        yield {
+            "status": "❗未识别到有效语音，请重录或改用文本输入。",
+            "audio_path": None,
+            "user_text": "",
+            "chat_add": [("user", "（空语音）"), ("assistant", "没听清哦，可以再试一次吗？")]
+        }
+        return
+    
+    # ASR 完成后（有 user_text）
+    yield {"status": "🤖 正在思考(LLM)...", "chat_add": [("user", user_text_all)]}
+
+    # 2) 分句
+    sentences = split_for_tts(user_text_all, max_chars=settings.MAX_REPLY_CHARS_VOICE)
+    yield {"status": f"🎧 已识别：{user_text_all}（分{len(sentences)}句处理）", "audio_path": None, "user_text": user_text_all, "chat_add": []}
+
+    # 3) 逐句：短回复 -> TTS -> 逐句输出
+    for idx, sent in enumerate(sentences, 1):
+        step_t0 = time.time()
+        # 3.1 分类（小模型兜底；你已有 classify，可选接入）
+        # cls = llm_client.classify(sent, schema=...)
+        # 先省略，直接短回复
+        # 3.2 短回复
+        turn = respond_short(user_text=sent, state=state, role=role, llm_client=llm_client)
+        # LLM 得到 reply 后，马上提示
+        yield {"status": "🔊 正在合成(TTS)...", "chat_add": []}
+        # 3.3 TTS（单句）
+        tts_res = tts_client.synthesize(turn.reply_text,
+                                        voice_type=(getattr(role, "tts", {}) or {}).get("voice_type"),
+                                        speed_ratio=(getattr(role, "tts", {}) or {}).get("speed_ratio"))
+        audio_path = tts_res.audio_path
+        
+        if audio_path:
+            # 统一成正斜杠，Gradio/浏览器对 Windows 路径更友好
+            audio_path = os.path.normpath(audio_path).replace("\\", "/")
+        # 3.4 逐句推送
+        yield {
+            "status": f"🗣️ 第{idx}/{len(sentences)}句：{sent}",
+            "audio_path": audio_path,   # gr.Audio 可直接播
+            "user_text": sent,
+            "chat_add": [("assistant", turn.reply_text)]
+        }
+        # 3.5 间隔（让前端有时间播放）- 可由前端控制，这里不sleep
+
+    total = int((time.time() - t0) * 1000)
+    write_log(settings.LOG_PATH, {
+        "event": "voice_sentence_loop_done",
+        "asr_ms": int((asr_t1-asr_t0)*1000),
+        "total_ms": total,
+        "n_sent": len(sentences)
+    })

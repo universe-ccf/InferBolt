@@ -8,7 +8,7 @@ load_dotenv()
 # LLM
 LLM_MODEL = os.getenv("MODEL_NAME", "doubao-seed-1.6-flash")
 LLM_TEMPERATURE = 0.7
-MAX_ROUNDS = 8
+MAX_ROUNDS = 10
 MAX_TOKENS_RESPONSE = 512
 
 API_KEY = os.getenv("API_KEY")
@@ -64,7 +64,7 @@ ASR_INPUT_FORMAT = "wav"     # 我们走本地wav->base64上送。若用URL方�
 ASR_USE_URL_UPLOAD = False   # False=base64内联上传；True=传url（见下文asr_client的两种分支）
 
 TTS_VOICE = "qiniu_zh_female_xyqxxj"   # 默认音色：校园清新学姐
-TTS_ENCODING = "mp3"         # 参照官网方式，后续可以尝试 "wav"，便于直接解码成numpy（避免mp3依赖）
+TTS_ENCODING = "wav"         # 官网方式为mp3，可以尝试 "wav"，便于直接解码成numpy（避免mp3依赖）
 TTS_SPEED = 1.0
 
 # === 缓存开关（与主流程解耦）===
@@ -78,3 +78,18 @@ ASR_TRANSPORT = "ws"   # 先用 WebSocket；需要回到 HTTP 时改为 "http"
 
 # WebSocket ASR 入口（七牛官方）
 ASR_WS_URL = "wss://openai.qiniu.com/v1/voice/asr"  # 文档给出的 ws 地址
+
+# —— TTS 静音排查/裁剪阈值（可调）——
+TTS_SILENCE_DBFS = -45.0        # 低于此 dBFS 视作静音（典型 -40~-50）
+TTS_RMS_WIN_MS   = 30           # 计算 RMS 的滑窗（毫秒）
+TTS_TRIM_PAD_MS  = 60           # 裁剪后两端保留少量“呼吸”时间（毫秒）
+TTS_TARGET_SR    = 24000        # 期望的统一采样率（与厂商默认一致即可）
+
+
+# ===== 语音句级快速反馈（B方案）参数 =====
+SENTENCE_SILENCE_MS = 800   # 断句的静音阈值（若走在线WS增量断句时用；现在先用于日志/保留）
+MAX_REPLY_CHARS_VOICE = 120 # 语音模式每句最长字数（1~2句）
+TTS_SEG_GAP_MS = 120        # 句与句之间的微静音（若做拼接时用；我们用逐句播就不用拼接）
+
+# 文本模式
+TEXT_STREAMING = True       # 文本对话开启流式输出（和语音解耦，不限长）

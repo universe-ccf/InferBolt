@@ -102,3 +102,362 @@
 {"ts_ms": 1758959726339, "event": "tts_request", "voice": "qiniu_zh_male_cxkjns", "speed": 0.95, "encoding": "mp3"}
 {"ts_ms": 1758959768540, "event": "tts_response", "bytes": 5650560}
 {"ts_ms": 1758959768569, "event": "voice_turn", "asr_ms": 5728, "llm_ms": 15914, "tts_ms": 42231, "total_ms": 63874, "asr_meta": {"transport": "ws", "ms": 5644}, "tts_meta": {"provider": "qiniu", "status": "ok", "voice": "qiniu_zh_male_cxkjns", "speed": 0.95}, "user_text": "我觉得在家学习更高效，请帮我把立场讲得更扎实一些", "skill": "steelman"}
+
+
+{"ts_ms": 1758967851361, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 25}
+{"ts_ms": 1758967851970, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250927181052F349E6EB142DD3160287'}, 'text': ''}}"}
+{"ts_ms": 1758967852744, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1758967853027, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1758967853566, "event": "asr_ws_partial", "len": 4}
+{"ts_ms": 1758967853904, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1758967854588, "event": "asr_ws_partial", "len": 11}
+{"ts_ms": 1758967855041, "event": "asr_ws_partial", "len": 13}
+{"ts_ms": 1758967855280, "event": "asr_ws_partial", "len": 15}
+{"ts_ms": 1758967856089, "event": "asr_ws_partial", "len": 17}
+{"ts_ms": 1758967856463, "event": "asr_ws_partial", "len": 20}
+{"ts_ms": 1758967856781, "event": "asr_ws_partial", "len": 23}
+{"ts_ms": 1758967857319, "event": "asr_ws_partial", "len": 28}
+{"ts_ms": 1758967857590, "event": "asr_ws_partial", "len": 30}
+{"ts_ms": 1758967859241, "event": "asr_ws_done", "ms": 7878, "len": 30}
+{"ts_ms": 1758967876383, "event": "chat_turn", "path": "skill", "skill": "steelman", "user_text": "我想就在家学习，更高效展开辩论，请你帮我把立场稍微更扎实一点", "route_debug": {"phase": "route", "rule_hit": false, "rule_name": null, "classify": {"intent": ["帮你把立场更扎实", "提升辩论展开效率", "辅助在家学习"], "skill": "steelman", "confidence": 1.0, "confidence_map": {"steelman": 1.0, "x_exam": 0.0, "counterfactual": 0.0, "none": 0.0}, "_debug": {"raw": "{\"intent\": [\"帮你把立场更扎实\", \"提升辩论展开效率\", \"辅助在家学习\"], \"confidence\": {\"steelman\": 1.0, \"x_exam\": 0.0, \"counterfactual\": 0.0, \"none\": 0.0}}", "candidate": "{\"intent\": [\"帮你把立场更扎实\", \"提升辩论展开效率\", \"辅助在家学习\"], \"confidence\": {\"steelman\": 1.0, \"x_exam\": 0.0, \"counterfactual\": 0.0, \"none\": 0.0}}", "parsed": {"intent": ["帮你把立场更扎实", "提升辩论展开效率", "辅助在家学习"], "confidence": {"steelman": 1.0, "x_exam": 0.0, "counterfactual": 0.0, "none": 0.0}}}}}, "reply_len": 736}
+{"ts_ms": 1758967876386, "event": "tts_truncate", "orig_len": 736}
+{"ts_ms": 1758967876388, "event": "tts_request", "voice": "qiniu_zh_male_cxkjns", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1758967921142, "event": "tts_response", "bytes": 10621386}
+{"ts_ms": 1758967922838, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 5310671, "rms_db": -27.829134289253208}
+{"ts_ms": 1758967922867, "event": "tts_trim_applied", "before_frames": 5310671, "after_frames": 5296271}
+{"ts_ms": 1758967922896, "event": "tts_save_done", "path": "cache/tts\\a219560f7809d796a6a5be9011b01ee3da1b32ce9feb56ffddd16fdd7f706a9f.wav", "bytes": 10592586}
+{"ts_ms": 1758967922907, "event": "voice_turn", "asr_ms": 7974, "llm_ms": 17062, "tts_ms": 46521, "total_ms": 71559, "asr_meta": {"transport": "ws", "ms": 7878}, "tts_meta": {"provider": "qiniu", "status": "ok", "voice": "qiniu_zh_male_cxkjns", "speed": 0.95}, "user_text": "我想就在家学习，更高效展开辩论，请你帮我把立场稍微更扎实一点", "skill": "steelman"}
+
+
+
+{"ts_ms": 1758984226997, "event": "chat_turn", "path": "skill", "skill": "steelman", "user_text": "我想就“在家学习更高效”展开辩论，请帮我把立场讲得更扎实一些", "route_debug": {"phase": "route", "rule_hit": false, "rule_name": null, "classify": {"intent": ["增强辩论立场说服力", "让观点更扎实", "提供辩论论据支持", "完善论证逻辑", "提升立场可信度"], "skill": "steelman", "confidence": 1.0, "confidence_map": {"steelman": 1.0, "x_exam": 0.0, "counterfactual": 0.0, "none": 0.0}, "_debug": {"raw": "{\"intent\": [\"增强辩论立场说服力\", \"让观点更扎实\", \"提供辩论论据支持\", \"完善论证逻辑\", \"提升立场可信度\"], \"confidence\": {\"steelman\": 1, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 0}}", "candidate": "{\"intent\": [\"增强辩论立场说服力\", \"让观点更扎实\", \"提供辩论论据支持\", \"完善论证逻辑\", \"提升立场可信度\"], \"confidence\": {\"steelman\": 1, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 0}}", "parsed": {"intent": ["增强辩论立场说服力", "让观点更扎实", "提供辩论论据支持", "完善论证逻辑", "提升立场可信度"], "confidence": {"steelman": 1, "x_exam": 0, "counterfactual": 0, "none": 0}}}}}, "reply_len": 694}
+
+
+{"ts_ms": 1758984311974, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 28}
+{"ts_ms": 1758984312609, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '202509272245127F838D0496C26527ADC7'}, 'text': ''}}"}
+{"ts_ms": 1758984313226, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1758984313509, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1758984314097, "event": "asr_ws_partial", "len": 4}
+{"ts_ms": 1758984314517, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1758984315114, "event": "asr_ws_partial", "len": 11}
+{"ts_ms": 1758984315613, "event": "asr_ws_partial", "len": 13}
+{"ts_ms": 1758984315914, "event": "asr_ws_partial", "len": 15}
+{"ts_ms": 1758984316842, "event": "asr_ws_partial", "len": 16}
+{"ts_ms": 1758984317103, "event": "asr_ws_partial", "len": 18}
+{"ts_ms": 1758984317374, "event": "asr_ws_partial", "len": 20}
+{"ts_ms": 1758984317628, "event": "asr_ws_partial", "len": 22}
+{"ts_ms": 1758984318268, "event": "asr_ws_partial", "len": 24}
+{"ts_ms": 1758984318675, "event": "asr_ws_partial", "len": 27}
+{"ts_ms": 1758984318928, "event": "asr_ws_partial", "len": 29}
+{"ts_ms": 1758984321107, "event": "asr_ws_done", "ms": 9131, "len": 29}
+
+
+{"ts_ms": 1758991695838, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 20}
+{"ts_ms": 1758991696385, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '2025092800481647C563159D08842B79C0'}, 'text': ''}}"}
+{"ts_ms": 1758991699941, "event": "asr_ws_done", "ms": 4100, "len": 0}
+{"ts_ms": 1758991708422, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 27}
+{"ts_ms": 1758991708921, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '2025092800482926DF955B7A5C72301A1B'}, 'text': ''}}"}
+{"ts_ms": 1758991709941, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1758991710200, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1758991710452, "event": "asr_ws_partial", "len": 5}
+{"ts_ms": 1758991710841, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1758991711607, "event": "asr_ws_partial", "len": 8}
+{"ts_ms": 1758991711853, "event": "asr_ws_partial", "len": 11}
+{"ts_ms": 1758991712303, "event": "asr_ws_partial", "len": 13}
+{"ts_ms": 1758991712486, "event": "asr_ws_partial", "len": 16}
+{"ts_ms": 1758991713274, "event": "asr_ws_partial", "len": 20}
+{"ts_ms": 1758991713506, "event": "asr_ws_partial", "len": 24}
+{"ts_ms": 1758991713963, "event": "asr_ws_partial", "len": 26}
+{"ts_ms": 1758991714203, "event": "asr_ws_partial", "len": 29}
+{"ts_ms": 1758991714442, "event": "asr_ws_partial", "len": 31}
+{"ts_ms": 1758991715688, "event": "asr_ws_done", "ms": 7264, "len": 31}
+
+
+{"ts_ms": 1758996415749, "event": "chat_turn", "path": "skill", "skill": "steelman", "user_text": "我想就“在家学习效率更高”展开辩论，请帮我将立场说得更扎实一些。", "route_debug": {"phase": "route", "rule_hit": false, "rule_name": null, "classify": {"intent": "增强立场说服力、提升论证扎实度、完善辩论观点、强化论据支撑", "skill": "steelman", "confidence": 1.0, "confidence_map": {"steelman": 1.0, "x_exam": 0.0, "counterfactual": 0.0, "none": 0.0}, "_debug": {"raw": "{\"intent\": \"增强立场说服力、提升论证扎实度、完善辩论观点、强化论据支撑\", \"confidence\": {\"steelman\": 1, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 0}}", "candidate": "{\"intent\": \"增强立场说服力、提升论证扎实度、完善辩论观点、强化论据支撑\", \"confidence\": {\"steelman\": 1, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 0}}", "parsed": {"intent": "增强立场说服力、提升论证扎实度、完善辩论观点、强化论据支撑", "confidence": {"steelman": 1, "x_exam": 0, "counterfactual": 0, "none": 0}}}}}, "reply_len": 726}
+{"ts_ms": 1758996455814, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 21}
+{"ts_ms": 1758996456505, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '2025092802073711F3A7EA4BDF9643B683'}, 'text': ''}}"}
+{"ts_ms": 1758996457128, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1758996457388, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1758996457661, "event": "asr_ws_partial", "len": 5}
+{"ts_ms": 1758996457932, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1758996458199, "event": "asr_ws_partial", "len": 10}
+{"ts_ms": 1758996458615, "event": "asr_ws_partial", "len": 12}
+{"ts_ms": 1758996459098, "event": "asr_ws_partial", "len": 15}
+{"ts_ms": 1758996459367, "event": "asr_ws_partial", "len": 16}
+{"ts_ms": 1758996460015, "event": "asr_ws_partial", "len": 18}
+{"ts_ms": 1758996460280, "event": "asr_ws_partial", "len": 19}
+{"ts_ms": 1758996460562, "event": "asr_ws_partial", "len": 21}
+{"ts_ms": 1758996460902, "event": "asr_ws_partial", "len": 23}
+{"ts_ms": 1758996461165, "event": "asr_ws_partial", "len": 26}
+{"ts_ms": 1758996461417, "event": "asr_ws_partial", "len": 30}
+{"ts_ms": 1758996462671, "event": "asr_ws_done", "ms": 6856, "len": 30}
+
+
+{"ts_ms": 1758998982204, "event": "chat_turn", "path": "skill", "skill": "steelman", "user_text": "我想就“在家学习更高效”展开辩论，请帮我把立场讲得更扎实一些", "route_debug": {"phase": "route", "rule_hit": false, "rule_name": null, "classify": {"intent": ["增强辩论立场的扎实性", "使立场表述更扎实"], "skill": "steelman", "confidence": 1.0, "confidence_map": {"steelman": 1.0, "x_exam": 0.0, "counterfactual": 0.0, "none": 0.0}, "_debug": {"raw": "{\"intent\": [\"增强辩论立场的扎实性\", \"使立场表述更扎实\"], \"confidence\": {\"steelman\": 1, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 0}}", "candidate": "{\"intent\": [\"增强辩论立场的扎实性\", \"使立场表述更扎实\"], \"confidence\": {\"steelman\": 1, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 0}}", "parsed": {"intent": ["增强辩论立场的扎实性", "使立场表述更扎实"], "confidence": {"steelman": 1, "x_exam": 0, "counterfactual": 0, "none": 0}}}}}, "reply_len": 698}
+{"ts_ms": 1758999526910, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 16}
+{"ts_ms": 1758999527678, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '202509280258484C991E595C718F2E04EE'}, 'text': ''}}"}
+{"ts_ms": 1758999528760, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1758999529018, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1758999529295, "event": "asr_ws_partial", "len": 4}
+{"ts_ms": 1758999529540, "event": "asr_ws_partial", "len": 5}
+{"ts_ms": 1758999529776, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1758999530285, "event": "asr_ws_partial", "len": 11}
+{"ts_ms": 1758999531001, "event": "asr_ws_partial", "len": 15}
+{"ts_ms": 1758999532345, "event": "asr_ws_done", "ms": 5434, "len": 15}
+
+
+
+{"ts_ms": 1759006737319, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 16}
+{"ts_ms": 1759006737924, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250928045858C9015453663A892DA685'}, 'text': ''}}"}
+{"ts_ms": 1759006738899, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759006739337, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759006739709, "event": "asr_ws_partial", "len": 5}
+{"ts_ms": 1759006740321, "event": "asr_ws_partial", "len": 6}
+{"ts_ms": 1759006741659, "event": "asr_ws_done", "ms": 4338, "len": 6}
+{"ts_ms": 1759006744548, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 15}
+{"ts_ms": 1759006745005, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250928045905D2E92811FE8CA12F616A'}, 'text': ''}}"}
+{"ts_ms": 1759006746055, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759006746431, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759006746670, "event": "asr_ws_partial", "len": 3}
+{"ts_ms": 1759006746912, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1759006747149, "event": "asr_ws_partial", "len": 11}
+{"ts_ms": 1759006747258, "event": "asr_ws_partial", "len": 13}
+{"ts_ms": 1759006747388, "event": "asr_ws_partial", "len": 15}
+{"ts_ms": 1759006748477, "event": "asr_ws_done", "ms": 3926, "len": 15}
+
+
+{"ts_ms": 1759009920312, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 15}
+{"ts_ms": 1759009920323, "event": "asr_ws_error", "error": "[Errno 11001] getaddrinfo failed"}
+
+
+{"ts_ms": 1759011043075, "event": "chat_turn", "path": "llm_default", "user_text": "我想了解一下羽毛球这项运动", "route_debug": {"phase": "route", "rule_hit": false, "rule_name": null, "classify": {"intent": "了解羽毛球这项运动相关信息", "skill": "none", "confidence": 1.0, "confidence_map": {"steelman": 0.0, "x_exam": 0.0, "counterfactual": 0.0, "none": 1.0}, "_debug": {"raw": "{\"intent\": \"了解羽毛球这项运动相关信息\", \"confidence\": {\"steelman\": 0, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 1}}", "candidate": "{\"intent\": \"了解羽毛球这项运动相关信息\", \"confidence\": {\"steelman\": 0, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 1}}", "parsed": {"intent": "了解羽毛球这项运动相关信息", "confidence": {"steelman": 0, "x_exam": 0, "counterfactual": 0, "none": 1}}}}}, "reply_len": 624}
+{"ts_ms": 1759011074450, "event": "chat_turn", "path": "llm_default", "user_text": "继续", "route_debug": {"phase": "route", "rule_hit": false, "rule_name": null, "classify": {"intent": "继续之前的任务", "skill": "none", "confidence": 1.0, "confidence_map": {"steelman": 0.0, "x_exam": 0.0, "counterfactual": 0.0, "none": 1.0}, "_debug": {"raw": "{\"intent\": \"继续之前的任务\", \"confidence\": {\"steelman\": 0, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 1}}", "candidate": "{\"intent\": \"继续之前的任务\", \"confidence\": {\"steelman\": 0, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 1}}", "parsed": {"intent": "继续之前的任务", "confidence": {"steelman": 0, "x_exam": 0, "counterfactual": 0, "none": 1}}}}}, "reply_len": 558}
+{"ts_ms": 1759011089911, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 11}
+{"ts_ms": 1759011090583, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '202509280611319937FE6D353D533A07E6'}, 'text': ''}}"}
+{"ts_ms": 1759011091187, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759011091421, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759011091653, "event": "asr_ws_partial", "len": 5}
+{"ts_ms": 1759011091887, "event": "asr_ws_partial", "len": 8}
+{"ts_ms": 1759011092142, "event": "asr_ws_partial", "len": 9}
+{"ts_ms": 1759011092566, "event": "asr_ws_partial", "len": 13}
+{"ts_ms": 1759011093833, "event": "asr_ws_done", "ms": 3919, "len": 13}
+{"ts_ms": 1759011098421, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759011110011, "event": "tts_response", "bytes": 1567056}
+{"ts_ms": 1759011110169, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 783506, "rms_db": -18.23942612652254}
+{"ts_ms": 1759011110179, "event": "tts_trim_applied", "before_frames": 783506, "after_frames": 770546}
+{"ts_ms": 1759011110183, "event": "tts_save_done", "path": "cache/tts\\6e04cc404b80ce0271f3c208b68f87f788eeecd03bb1e2e9efd6bbc849875ca3.wav", "bytes": 1541136}
+{"ts_ms": 1759011110259, "event": "voice_sentence_loop_done", "asr_ms": 4000, "total_ms": 20355, "n_sent": 1}
+
+
+{"ts_ms": 1759014878810, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 15}
+{"ts_ms": 1759014879667, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250928071439D99A170F97F7B0363F01'}, 'text': ''}}"}
+{"ts_ms": 1759014880816, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759014881045, "event": "asr_ws_partial", "len": 4}
+{"ts_ms": 1759014881255, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1759014881538, "event": "asr_ws_partial", "len": 9}
+{"ts_ms": 1759014881786, "event": "asr_ws_partial", "len": 11}
+{"ts_ms": 1759014883485, "event": "asr_ws_done", "ms": 4672, "len": 11}
+{"ts_ms": 1759014885929, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759014894898, "event": "tts_response", "bytes": 628214}
+{"ts_ms": 1759014894993, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 314085, "rms_db": -18.87495256738577}
+{"ts_ms": 1759014895004, "event": "tts_trim_applied", "before_frames": 314085, "after_frames": 301125}
+{"ts_ms": 1759014895062, "event": "tts_save_done", "path": "cache/tts\\9a15d0540f71c02e97653b4a89010208359f4775a1f040f66b979cd786e914bf.wav", "bytes": 602294}
+{"ts_ms": 1759014895136, "event": "voice_sentence_loop_done", "asr_ms": 4753, "total_ms": 16347, "n_sent": 1}
+{"ts_ms": 1759014923963, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 7}
+{"ts_ms": 1759014924419, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '2025092807152483B32CD678E95031E375'}, 'text': ''}}"}
+{"ts_ms": 1759014924924, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759014926754, "event": "asr_ws_done", "ms": 2785, "len": 2}
+{"ts_ms": 1759014929420, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759014935339, "event": "tts_response", "bytes": 790542}
+{"ts_ms": 1759014935450, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 395249, "rms_db": -17.332351762819226}
+{"ts_ms": 1759014935459, "event": "tts_trim_applied", "before_frames": 395249, "after_frames": 382289}
+{"ts_ms": 1759014935462, "event": "tts_save_done", "path": "cache/tts\\ce7560d19324ff405d0a90d5b9cefd752e31a04d7f83321312e4072089319edd.wav", "bytes": 764622}
+{"ts_ms": 1759014935543, "event": "voice_sentence_loop_done", "asr_ms": 2851, "total_ms": 11598, "n_sent": 1}
+
+
+{"ts_ms": 1759016998593, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 16}
+{"ts_ms": 1759016999485, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250928074959CF604B547A942E3B8EB2'}, 'text': ''}}"}
+{"ts_ms": 1759017000665, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759017000913, "event": "asr_ws_partial", "len": 5}
+{"ts_ms": 1759017001141, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1759017001372, "event": "asr_ws_partial", "len": 8}
+{"ts_ms": 1759017001842, "event": "asr_ws_partial", "len": 10}
+{"ts_ms": 1759017002268, "event": "asr_ws_partial", "len": 12}
+{"ts_ms": 1759017002483, "event": "asr_ws_partial", "len": 14}
+{"ts_ms": 1759017003818, "event": "asr_ws_done", "ms": 5221, "len": 14}
+
+
+{"ts_ms": 1759034297998, "event": "chat_turn", "path": "llm_default", "user_text": "我想了解一下网球这项运动", "route_debug": {"phase": "route", "rule_hit": false, "rule_name": null, "classify": {"intent": "了解网球运动的基本信息", "skill": "none", "confidence": 1.0, "confidence_map": {"steelman": 0.0, "x_exam": 0.0, "counterfactual": 0.0, "none": 1.0}, "_debug": {"raw": "{\"intent\": \"了解网球运动的基本信息\", \"confidence\": {\"steelman\": 0, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 1}}", "candidate": "{\"intent\": \"了解网球运动的基本信息\", \"confidence\": {\"steelman\": 0, \"x_exam\": 0, \"counterfactual\": 0, \"none\": 1}}", "parsed": {"intent": "了解网球运动的基本信息", "confidence": {"steelman": 0, "x_exam": 0, "counterfactual": 0, "none": 1}}}}}, "reply_len": 414}
+{"ts_ms": 1759034350226, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 13}
+{"ts_ms": 1759034350782, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '2025092812391020ADF8923CFB7A3D3B2E'}, 'text': ''}}"}
+{"ts_ms": 1759034352323, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759034352605, "event": "asr_ws_partial", "len": 5}
+{"ts_ms": 1759034352865, "event": "asr_ws_partial", "len": 6}
+{"ts_ms": 1759034353155, "event": "asr_ws_partial", "len": 8}
+{"ts_ms": 1759034353385, "event": "asr_ws_partial", "len": 12}
+{"ts_ms": 1759034354869, "event": "asr_ws_done", "ms": 4641, "len": 12}
+{"ts_ms": 1759034358214, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759034368701, "event": "tts_response", "bytes": 605722}
+{"ts_ms": 1759034368769, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 302839, "rms_db": -17.37226980494383}
+{"ts_ms": 1759034368780, "event": "tts_trim_applied", "before_frames": 302839, "after_frames": 289879}
+{"ts_ms": 1759034368785, "event": "tts_save_done", "path": "cache/tts\\e94bf699f3cda05a6af78ff1f34b70a527154bd5c50cf65d66a629de0345c6e0.wav", "bytes": 579802}
+{"ts_ms": 1759034368852, "event": "voice_sentence_loop_done", "asr_ms": 4743, "total_ms": 18663, "n_sent": 1}
+
+
+{"ts_ms": 1759046962764, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 7}
+{"ts_ms": 1759046963394, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '2025092816092373176311F870C444097E'}, 'text': ''}}"}
+{"ts_ms": 1759046965815, "event": "asr_ws_done", "ms": 3050, "len": 0}
+{"ts_ms": 1759046972313, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 7}
+{"ts_ms": 1759046972847, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '2025092816093383B32CD678E9504396C9'}, 'text': ''}}"}
+{"ts_ms": 1759046973683, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759046975376, "event": "asr_ws_done", "ms": 3061, "len": 2}
+{"ts_ms": 1759046978876, "event": "tts_request", "voice": "qiniu_zh_male_cxkjns", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759046988019, "event": "tts_response", "bytes": 659874}
+{"ts_ms": 1759046988100, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 329915, "rms_db": -19.330791643715695}
+{"ts_ms": 1759046988114, "event": "tts_trim_applied", "before_frames": 329915, "after_frames": 313355}
+{"ts_ms": 1759046988117, "event": "tts_save_done", "path": "cache/tts\\f5a4c8bde866054a0a00e4ef0eb6181ceab9362dd20d6db960f97b46526b57a6.wav", "bytes": 626754}
+{"ts_ms": 1759046988135, "event": "voice_sentence_loop_done", "asr_ms": 3145, "total_ms": 15855, "n_sent": 1}
+
+
+{"ts_ms": 1759049744703, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 10}
+{"ts_ms": 1759049745337, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250928165545363BE4CC719A8C45500B'}, 'text': ''}}"}
+{"ts_ms": 1759049746248, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759049748127, "event": "asr_ws_done", "ms": 3420, "len": 2}
+{"ts_ms": 1759049752964, "event": "tts_request", "voice": "qiniu_zh_male_cxkjns", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759049761196, "event": "tts_response", "bytes": 871550}
+{"ts_ms": 1759049761321, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 435753, "rms_db": -19.796865062855566}
+{"ts_ms": 1759049761338, "event": "tts_trim_applied", "before_frames": 435753, "after_frames": 420633}
+{"ts_ms": 1759049761349, "event": "tts_save_done", "path": "cache/tts\\84f4da3f7154097e7a8d42bc4cb58e4fb0ee56d590d44c0d0717d0f0ef659055.wav", "bytes": 841310}
+{"ts_ms": 1759049761365, "event": "voice_sentence_loop_done", "asr_ms": 3511, "total_ms": 16680, "n_sent": 1}
+
+
+
+{"ts_ms": 1759055492781, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 53}
+{"ts_ms": 1759055493338, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '202509281831338208E2DB2B19015337F2'}, 'text': ''}}"}
+{"ts_ms": 1759055499231, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759055499466, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759055500156, "event": "asr_ws_partial", "len": 3}
+{"ts_ms": 1759055501255, "event": "asr_ws_done", "ms": 8471, "len": 3}
+{"ts_ms": 1759055504598, "event": "tts_request", "voice": "qiniu_zh_male_cxkjns", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759055513538, "event": "tts_response", "bytes": 745966}
+{"ts_ms": 1759055513617, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 372961, "rms_db": -19.396392215503976}
+{"ts_ms": 1759055513624, "event": "tts_trim_applied", "before_frames": 372961, "after_frames": 357121}
+{"ts_ms": 1759055513652, "event": "tts_save_done", "path": "cache/tts\\3c433c0f97d03c0d0c10f9fdb28bc96d4c71130518f0ac92dfb565cc500c3b9b.wav", "bytes": 714286}
+{"ts_ms": 1759055513717, "event": "voice_sentence_loop_done", "asr_ms": 8583, "total_ms": 20990, "n_sent": 1}
+{"ts_ms": 1759055575491, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 19}
+{"ts_ms": 1759055576010, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '202509281832564CEB7CBCBE3DB349F4E1'}, 'text': ''}}"}
+{"ts_ms": 1759055576980, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759055577440, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759055577678, "event": "asr_ws_partial", "len": 4}
+{"ts_ms": 1759055578156, "event": "asr_ws_partial", "len": 8}
+{"ts_ms": 1759055578558, "event": "asr_ws_partial", "len": 10}
+{"ts_ms": 1759055578955, "event": "asr_ws_partial", "len": 15}
+{"ts_ms": 1759055579199, "event": "asr_ws_partial", "len": 16}
+{"ts_ms": 1759055580885, "event": "asr_ws_done", "ms": 5391, "len": 16}
+{"ts_ms": 1759055585367, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759055596176, "event": "tts_response", "bytes": 1084060}
+{"ts_ms": 1759055596312, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 542008, "rms_db": -17.688218239522968}
+{"ts_ms": 1759055596321, "event": "tts_trim_applied", "before_frames": 542008, "after_frames": 529048}
+{"ts_ms": 1759055596325, "event": "tts_save_done", "path": "cache/tts\\0b185d3e2bafbb7c101432726ff71b74fd18dd39710a25262af5f99e08934496.wav", "bytes": 1058140}
+{"ts_ms": 1759055596401, "event": "voice_sentence_loop_done", "asr_ms": 5463, "total_ms": 20933, "n_sent": 1}
+{"ts_ms": 1759055691304, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 32}
+{"ts_ms": 1759055691814, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250928183452E46A6F655DCDC048AE7A'}, 'text': ''}}"}
+{"ts_ms": 1759055692974, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759055693338, "event": "asr_ws_partial", "len": 3}
+{"ts_ms": 1759055693593, "event": "asr_ws_partial", "len": 5}
+{"ts_ms": 1759055694249, "event": "asr_ws_partial", "len": 7}
+{"ts_ms": 1759055694502, "event": "asr_ws_partial", "len": 8}
+{"ts_ms": 1759055694717, "event": "asr_ws_partial", "len": 11}
+{"ts_ms": 1759055694958, "event": "asr_ws_partial", "len": 13}
+{"ts_ms": 1759055695200, "event": "asr_ws_partial", "len": 16}
+{"ts_ms": 1759055695434, "event": "asr_ws_partial", "len": 18}
+{"ts_ms": 1759055695650, "event": "asr_ws_partial", "len": 21}
+{"ts_ms": 1759055696266, "event": "asr_ws_partial", "len": 25}
+{"ts_ms": 1759055696540, "event": "asr_ws_partial", "len": 28}
+{"ts_ms": 1759055696757, "event": "asr_ws_partial", "len": 29}
+{"ts_ms": 1759055697011, "event": "asr_ws_partial", "len": 31}
+{"ts_ms": 1759055697496, "event": "asr_ws_partial", "len": 33}
+{"ts_ms": 1759055697864, "event": "asr_ws_partial", "len": 34}
+{"ts_ms": 1759055698100, "event": "asr_ws_partial", "len": 37}
+{"ts_ms": 1759055699767, "event": "asr_ws_done", "ms": 8461, "len": 37}
+{"ts_ms": 1759055705987, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759055711488, "event": "tts_response", "bytes": 752486}
+{"ts_ms": 1759055711579, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 376221, "rms_db": -16.3701778425977}
+{"ts_ms": 1759055711591, "event": "tts_trim_applied", "before_frames": 376221, "after_frames": 363261}
+{"ts_ms": 1759055711599, "event": "tts_save_done", "path": "cache/tts\\d2f9e8c78df5a0083e12a70f61d7ac8e59ffeab1313510b1fdfbf7bdd0acfc09.wav", "bytes": 726566}
+{"ts_ms": 1759055711668, "event": "voice_sentence_loop_done", "asr_ms": 8586, "total_ms": 20422, "n_sent": 1}
+{"ts_ms": 1759055729839, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 53}
+{"ts_ms": 1759055730386, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '202509281835304DFCE1A3C3DA6E5DE736'}, 'text': ''}}"}
+{"ts_ms": 1759055737301, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759055737559, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759055738384, "event": "asr_ws_partial", "len": 3}
+{"ts_ms": 1759055739494, "event": "asr_ws_done", "ms": 9653, "len": 3}
+{"ts_ms": 1759055741653, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759055750664, "event": "tts_response", "bytes": 559416}
+{"ts_ms": 1759055750738, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 279686, "rms_db": -18.397824667760986}
+{"ts_ms": 1759055750743, "event": "tts_trim_applied", "before_frames": 279686, "after_frames": 267446}
+{"ts_ms": 1759055750780, "event": "tts_save_done", "path": "cache/tts\\82e408917db8a6b653a766f7fefe241f649c6bf7fa60253a31031a298ba263de.wav", "bytes": 534936}
+{"ts_ms": 1759055750875, "event": "voice_sentence_loop_done", "asr_ms": 9789, "total_ms": 21107, "n_sent": 1}
+{"ts_ms": 1759059260318, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 6}
+{"ts_ms": 1759059261088, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '2025092819342175D051906391704D78F9'}, 'text': ''}}"}
+{"ts_ms": 1759059261655, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759059261905, "event": "asr_ws_partial", "len": 4}
+{"ts_ms": 1759059262137, "event": "asr_ws_partial", "len": 6}
+{"ts_ms": 1759059263388, "event": "asr_ws_done", "ms": 3066, "len": 6}
+{"ts_ms": 1759059266537, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759059274520, "event": "tts_response", "bytes": 427972}
+{"ts_ms": 1759059274575, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 213964, "rms_db": -17.00742181477694}
+{"ts_ms": 1759059274587, "event": "tts_trim_applied", "before_frames": 213964, "after_frames": 201004}
+{"ts_ms": 1759059274592, "event": "tts_save_done", "path": "cache/tts\\d78dd9f412eaeda7c01f68f439b0f609da364e795902af7dacdd8a81f2782eb3.wav", "bytes": 402052}
+{"ts_ms": 1759059274660, "event": "voice_sentence_loop_done", "asr_ms": 3141, "total_ms": 14364, "n_sent": 1}
+{"ts_ms": 1759059291788, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 9}
+{"ts_ms": 1759059292238, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '202509281934520BE3DBFF556F286236AE'}, 'text': ''}}"}
+{"ts_ms": 1759059292776, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759059293075, "event": "asr_ws_partial", "len": 4}
+{"ts_ms": 1759059293373, "event": "asr_ws_partial", "len": 5}
+{"ts_ms": 1759059293627, "event": "asr_ws_partial", "len": 8}
+{"ts_ms": 1759059295317, "event": "asr_ws_done", "ms": 3527, "len": 8}
+{"ts_ms": 1759059297848, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759059305959, "event": "tts_response", "bytes": 657084}
+{"ts_ms": 1759059306041, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 328520, "rms_db": -17.68547870834766}
+{"ts_ms": 1759059306048, "event": "tts_trim_applied", "before_frames": 328520, "after_frames": 317000}
+{"ts_ms": 1759059306053, "event": "tts_save_done", "path": "cache/tts\\76c434c7329648ebf7c33e35446a81731c0d8ebdb9522e6f2ad1922506e50c0c.wav", "bytes": 634044}
+{"ts_ms": 1759059306114, "event": "voice_sentence_loop_done", "asr_ms": 3599, "total_ms": 14352, "n_sent": 1}
+{"ts_ms": 1759060766076, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 8}
+{"ts_ms": 1759060766674, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250928195927A8D3ED1EEE4301619094'}, 'text': ''}}"}
+{"ts_ms": 1759060767239, "event": "asr_ws_partial", "len": 1}
+{"ts_ms": 1759060767544, "event": "asr_ws_partial", "len": 4}
+{"ts_ms": 1759060767809, "event": "asr_ws_partial", "len": 6}
+{"ts_ms": 1759060768090, "event": "asr_ws_partial", "len": 8}
+{"ts_ms": 1759060768418, "event": "asr_ws_partial", "len": 10}
+{"ts_ms": 1759060768675, "event": "asr_ws_partial", "len": 14}
+{"ts_ms": 1759060769791, "event": "asr_ws_done", "ms": 3713, "len": 14}
+{"ts_ms": 1759060772860, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759060780948, "event": "tts_response", "bytes": 906110}
+{"ts_ms": 1759060781101, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 453033, "rms_db": -17.520006860834304}
+{"ts_ms": 1759060781110, "event": "tts_trim_applied", "before_frames": 453033, "after_frames": 440073}
+{"ts_ms": 1759060781135, "event": "tts_save_done", "path": "cache/tts\\330101e1b10cab73c56f9d6f047e63b231eb5fbe455da9cbf213e0bcd7780656.wav", "bytes": 880190}
+{"ts_ms": 1759060781217, "event": "voice_sentence_loop_done", "asr_ms": 3784, "total_ms": 15166, "n_sent": 1}
+{"ts_ms": 1759062588500, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 8}
+{"ts_ms": 1759062589066, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '2025092820294991D0A20BE64BF7694DEC'}, 'text': ''}}"}
+{"ts_ms": 1759062589765, "event": "asr_ws_partial", "len": 3}
+{"ts_ms": 1759062589987, "event": "asr_ws_partial", "len": 5}
+{"ts_ms": 1759062590224, "event": "asr_ws_partial", "len": 8}
+{"ts_ms": 1759062590472, "event": "asr_ws_partial", "len": 10}
+{"ts_ms": 1759062591738, "event": "asr_ws_done", "ms": 3235, "len": 10}
+{"ts_ms": 1759062595112, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759062603628, "event": "tts_response", "bytes": 549048}
+{"ts_ms": 1759062603710, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 274502, "rms_db": -16.684009382094935}
+{"ts_ms": 1759062603718, "event": "tts_trim_applied", "before_frames": 274502, "after_frames": 261542}
+{"ts_ms": 1759062603722, "event": "tts_save_done", "path": "cache/tts\\897ab9c0d3fba6ac5b4ae9ed57d39be9c9e2d6ec6beb4752e262d24acb3a7e59.wav", "bytes": 523128}
+{"ts_ms": 1759062603788, "event": "voice_sentence_loop_done", "asr_ms": 3305, "total_ms": 15305, "n_sent": 1}
+{"ts_ms": 1759062625102, "event": "asr_ws_open", "url": "wss://openai.qiniu.com/v1/voice/asr", "segs": 7}
+{"ts_ms": 1759062625591, "event": "asr_ws_cfg_ack", "msg": "{'audio_info': {'duration': 0}, 'result': {'additions': {'log_id': '20250928203026C7A337D810634650C746'}, 'text': ''}}"}
+{"ts_ms": 1759062626225, "event": "asr_ws_partial", "len": 2}
+{"ts_ms": 1759062627946, "event": "asr_ws_done", "ms": 2842, "len": 2}
+{"ts_ms": 1759062630220, "event": "tts_request", "voice": "qiniu_zh_female_tmjxxy", "speed": 0.95, "encoding": "wav"}
+{"ts_ms": 1759062639397, "event": "tts_response", "bytes": 620250}
+{"ts_ms": 1759062639539, "event": "tts_wav_info", "sr": 24000, "ch": 1, "sw": 2, "frames": 310103, "rms_db": -17.023272582636935}
+{"ts_ms": 1759062639565, "event": "tts_trim_applied", "before_frames": 310103, "after_frames": 297143}
+{"ts_ms": 1759062639570, "event": "tts_save_done", "path": "cache/tts\\bf5035c69e036aa61df50e6002098272f4bb327efb711f2328d4c47a4ec5a5d0.wav", "bytes": 594330}
+{"ts_ms": 1759062639765, "event": "voice_sentence_loop_done", "asr_ms": 2937, "total_ms": 14678, "n_sent": 1}
